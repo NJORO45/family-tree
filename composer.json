@@ -1,0 +1,17 @@
+{
+    "name": "hp/family-tree",
+    "description": "its a project for showing a family tree branches with features like adingmember and editing",
+    "autoload": {
+        "psr-4": {
+            "Hp\\FamilyTree\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "tallman",
+            "email": "njoro45.itap@gmail.com"
+        }
+    ],
+    "require": {
+    }
+}

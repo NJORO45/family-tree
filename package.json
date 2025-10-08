@@ -1,0 +1,9 @@
+{
+  "name": "family-tree",
+  "scripts": {
+    "watch": "npx tailwindcss -i ./src/input.css -o ./public/main.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
