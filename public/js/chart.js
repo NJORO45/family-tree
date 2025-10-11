@@ -1,4 +1,6 @@
 
+const nodeCards = {}; // 🔹 global dictionary to store node.id() → card element
+
 addEventListener("DOMContentLoaded",()=>{
       var cy = cytoscape({
       container: document.getElementById('family-tree-area'),
@@ -26,11 +28,6 @@ addEventListener("DOMContentLoaded",()=>{
         { data: { id: 'ses2', name: 'ses', nickname: '', role: "", photo: '' }},
         { data: { id: 'jeni2', name: 'jeni', nickname: '', role: "", photo: '' }},
 
-        // // Family branch nodes (like marriage bubbles)
-        // { data: { id: 'fam1', name: 'Family 1', type: 'family' }},
-
-        // Relationships via family nodes
-        // { data: { source: 'mary', target: 'fam1' }},
         { data: { source: 'same', target: 'mary' }},
         { data: { source: 'same', target: 'rosemary' }},
 
@@ -42,9 +39,6 @@ addEventListener("DOMContentLoaded",()=>{
         { data: { source: 'dun', target: 'ann' }},
         { data: { source: 'dun', target: 'ann2' }},
         { data: { source: 'dun', target: 'rose' }},
-
-        // { data: { source: 'dun', target: 'fam2' }},
-        // { data: { source: 'ann', target: 'fam2' }},
 
         { data: { source: 'ann', target: 'john' }},
         { data: { source: 'ann', target: 'ses' }},
@@ -77,23 +71,27 @@ addEventListener("DOMContentLoaded",()=>{
         orientation: 'horizontal' // Top → Bottom
       },
        //  Control zoom behavior
-      minZoom: 0.5,   // ← minimum zoom allowed (default is 0.1)
-      maxZoom: 20,     // ← maximum zoom allowed
-      wheelSensitivity: 0.2 // optional: smoother scroll zoom
+      minZoom: 0.5,   //  minimum zoom allowed 
+      maxZoom: 5,     //  maximum zoom allowed
+      wheelSensitivity: 0.2 // smoother scroll zoom
     });
 // Create HTML cards for each node
 cy.nodes().forEach(node => {
    const d = node.data();
   const card = document.createElement('div');
-  card.className = "card max-w-sm rounded-lg p-2 bg-gray-300";
+  card.className = "card absolute w-full rounded-lg p-2 bg-gray-300";
+   
+  card.style.position = "absolute";
+  card.style.transformOrigin = "center center";
+  card.style.transition = "transform 0.1s ease-out, width 0.1s ease-out, height 0.1s ease-out";
   card.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
       <img class="w-full h-auto rounded" src="${node.data('photo')}" alt="">
     </div>
     <div class="flex flex-col space-y-1 text-xs mt-1">
-      <div class="flex flex-row gap-1"><label>Name:</label><p>${node.data('name')}</p></div>
-      <div class="flex flex-row gap-1"><label>Nickname:</label><p>${node.data('nickname')}</p></div>
-      <div  class="w-full flex justify-end"><button id="readMore" class="readMore cursor-pointer bg-white rounded px-2 py-1">Read More</button></div>
+      <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>Name:</label><p>${node.data('name')}</p></div>
+      <div class="flex flex-row gap-1 flex-wrap "><label class="flex flex-wrap ">Nick name:</label><p>${node.data('nickname')}</p></div>
+      <div  class="w-full flex justify-center md:justify-end"><button id="readMore" class="readMore cursor-pointer bg-white rounded px-2 py-1">Read More</button></div>
     </div>
   `;
 
@@ -131,6 +129,9 @@ cy.nodes().forEach(node => {
     detailsBox.classList.add("hidden");
   });
   });
+   //store reference
+  nodeCards[node.id()] = card;
+
   document.getElementById('family-tree-area').appendChild(card);
 
   // position the card based on the node
@@ -144,37 +145,57 @@ cy.nodes().forEach(node => {
     card.style.left = p.x + 'px';
     card.style.top = p.y + 'px';
   });
-  const cardDiv = document.querySelectorAll(".card");
-  //console.log(cardDiv)
-  // cardDiv.forEach(card=>{
-  //   card.addEventListener("click",(e)=>{
-  //     console.log(e.currentTarget)
-  //   });
-  // });
- 
 
 });
-    //  Function to update card positions + scaling
-    function updateCardPositions() {
-      const zoom = cy.zoom();
 
-      cy.nodes().forEach(node => {
-        const pos = node.renderedPosition();
-        const card = nodeCards[node.id()];
-        if (!card) return;
-
-        // position each card at node location
-        card.style.left = pos.x + 'px';
-        card.style.top = pos.y + 'px';
-
-        // ✨ Smooth dynamic scaling based on zoom
-        const scale = Math.max(0.7, Math.min(1.1, 1 / zoom));
-        card.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      });
+    //updateCardPositions(); // initial render
+function updateCardPositions() {
+  const zoom = cy.zoom(); // current zoom level
+  cy.nodes().forEach(node => {
+    const pos = node.renderedPosition();
+    const card = nodeCards[node.id()];
+    // Debug check
+    if (!card) {
+      console.warn(`No card found for node: ${node.id()}`);
+      return; // skip if missing
     }
 
-    //  Update on zoom/pan/render
-    //cy.on('render zoom pan position', updateCardPositions);
-    //updateCardPositions(); // initial render
+    //  If detected, log one-time info
+    //  position card
+    card.style.left = pos.x + 'px';
+    card.style.top = pos.y + 'px';
 
+    // calculate dynamic scale factor
+    // when zoom = 1 → normal size
+    // when zoom > 1 → slightly smaller
+    // when zoom < 1 → slightly bigger
+    const scale = Math.max(0.5, Math.min(1.2, 1 / zoom));
+   // Adjust card size based on scale range
+    if (scale >= 1.2) {
+      const baseWidth = 80;  // your default card width
+      // when zoomed out too far, shrink less aggressively
+      card.querySelector("img").style.display = "none";
+      card.style.width = `${baseWidth }px`;
+      
+    } else {
+      const baseWidth = 140;  // your default card width
+      // when zoomed in or normal zoom, scale normally
+      card.querySelector("img").style.display = "block";
+      card.style.width = `${baseWidth}px`;
+    }
+    // apply transform
+    card.style.transform = `translate(-50%, -50%) `;
+  
+  });
+}
+let lastUpdate = 0;
+// update on zoom/pan/render
+cy.on('zoom pan render', ()=>{
+  const now = Date.now();
+  if(now - lastUpdate >30){
+    updateCardPositions();
+    lastUpdate=now;
+  }
+});
+updateCardPositions(); // initial render
 });
