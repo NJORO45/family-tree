@@ -1,53 +1,109 @@
 
+import { showTimedAlert } from './utilities/alerthandler.js';
+import { showAlert } from './utilities/alerthandler.js';
 const nodeCards = {}; // 🔹 global dictionary to store node.id() → card element
+async function getdataFunction() {
+           
+            const response = await fetch('getdata.php',{
+                method:"GET",
+                headers:{"Accept":"application/json"}  
+            });
+            const text = await response.text();
+            console.log(text)
+            try{
+                const result = JSON.parse(text);
+                console.log(result)
+             if (Array.isArray(result)) {
+                console.log("✅ Data fetched successfully:", result);
+                return result;
+              } else if (result.success && Array.isArray(result.message)) {
+                // Support for wrapped responses too
+                return result.message;
+              } else {
+                console.error("❌ Unexpected format:", result);
+                return [];
+              }
+            }
+            catch(jsonErr){
+              console.error("JSON parse error:", jsonErr, text);
+              return [];
+            }
+}
+addEventListener("DOMContentLoaded",async()=>{
 
-addEventListener("DOMContentLoaded",()=>{
+  const newmemberData = document.querySelector("#newmemberData");
+      const alertMessage = document.querySelector("#alertMessage");
+    const p = document.querySelector("p");
+    const closenewmemberdata = document.querySelector("#closenewmemberdata");
+    const addnewNode = document.querySelector("#addnewNode");
+    const newNodeData = document.querySelector("#newNodeData");
+    const addNewNodeBtn = document.querySelector("#addNewNodeBtn");
+    const newmemberPhoto = document.querySelector("#newmemberPhoto");
+    const newMemberpreview = document.querySelector("#newMemberpreview");
+
+    const isDeceasednewMember = document.querySelector("#isDeceasednewMember");
+    const newMemberdeathContainer = document.querySelector("#newMemberdeathContainer");
+
+    const newmembersname = document.querySelector("#newmembersname");
+    const newMemberidNumber = document.querySelector("#newMemberidNumber");
+    const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
+    const newMemberdied = document.querySelector("#newMemberdied");
+    const newMembernickName = document.querySelector("#newMembernickName");
+    const csrtfTokenid = document.querySelector("#csrtfTokenid");
+
+    closenewmemberdata.addEventListener("click",()=>{
+        newmemberData.classList.add("hidden");
+    });
+
+  const data =await getdataFunction();
+  console.group(data);
       var cy = cytoscape({
       container: document.getElementById('family-tree-area'),
+      elements:data,
+      // elements: [
+      //   // People
+      //   { data: { id: 'same', name: 'Same', nickname: 'Baba Michael', role: 'Root Father', photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
+      //   { data: { id: 'mary', name: 'Mary', nickname: 'Mama Michael', role: "Same's Wife", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
+      //   { data: { id: 'rosemary', name: 'rosemary', nickname: 'Mama Michael', role: "Same's Wife", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
 
-      elements: [
-        // People
-        { data: { id: 'same', name: 'Same', nickname: 'Baba Michael', role: 'Root Father', photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
-        { data: { id: 'mary', name: 'Mary', nickname: 'Mama Michael', role: "Same's Wife", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
-        { data: { id: 'rosemary', name: 'rosemary', nickname: 'Mama Michael', role: "Same's Wife", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
+      //   { data: { id: 'michael', name: 'Michael', nickname: '', role: "", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
+      //   { data: { id: 'dun', name: 'dun', nickname: '', role: "", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
 
-        { data: { id: 'michael', name: 'Michael', nickname: '', role: "", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
-        { data: { id: 'dun', name: 'dun', nickname: '', role: "", photo: 'http://localhost:8000/project/family-tree/img/one.jfif' }},
+      //   { data: { id: 'maryann', name: 'maryann', nickname: '', role: "", photo: '' }},
 
-        { data: { id: 'maryann', name: 'maryann', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'ann', name: 'ann', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'ann2', name: 'ann2', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'rose', name: 'rose', nickname: '', role: "", photo: '' }},
 
-        { data: { id: 'ann', name: 'ann', nickname: '', role: "", photo: '' }},
-        { data: { id: 'ann2', name: 'ann2', nickname: '', role: "", photo: '' }},
-        { data: { id: 'rose', name: 'rose', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'john', name: 'john', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'ses', name: 'ses', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'jeni', name: 'jeni', nickname: '', role: "", photo: '' }},
 
-        { data: { id: 'john', name: 'john', nickname: '', role: "", photo: '' }},
-        { data: { id: 'ses', name: 'ses', nickname: '', role: "", photo: '' }},
-        { data: { id: 'jeni', name: 'jeni', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'john2', name: 'john', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'ses2', name: 'ses', nickname: '', role: "", photo: '' }},
+      //   { data: { id: 'jeni2', name: 'jeni', nickname: '', role: "", photo: '' }},
+      //   //relationship
+      //   { data: { source: 'same', target: 'mary' }},
+      //   { data: { source: 'same', target: 'rosemary' }},
 
-        { data: { id: 'john2', name: 'john', nickname: '', role: "", photo: '' }},
-        { data: { id: 'ses2', name: 'ses', nickname: '', role: "", photo: '' }},
-        { data: { id: 'jeni2', name: 'jeni', nickname: '', role: "", photo: '' }},
+      //   { data: { source: 'rosemary', target: 'maryann' }},
 
-        { data: { source: 'same', target: 'mary' }},
-        { data: { source: 'same', target: 'rosemary' }},
-
-        { data: { source: 'rosemary', target: 'maryann' }},
-
-        { data: { source: 'mary', target: 'michael' }},
+      //   { data: { source: 'mary', target: 'michael' }},
         
-        { data: { source: 'mary', target: 'dun' }},
-        { data: { source: 'dun', target: 'ann' }},
-        { data: { source: 'dun', target: 'ann2' }},
-        { data: { source: 'dun', target: 'rose' }},
+      //   { data: { source: 'mary', target: 'dun' }},
 
-        { data: { source: 'ann', target: 'john' }},
-        { data: { source: 'ann', target: 'ses' }},
-        { data: { source: 'ann', target: 'jeni' }},
+      //   { data: { source: 'dun', target: 'ann' }},
+      //   { data: { source: 'dun', target: 'ann2' }},
+      //   { data: { source: 'dun', target: 'rose' }},
 
-        { data: { source: 'ann2', target: 'john2' }},
-        { data: { source: 'ann2', target: 'ses2' }},
-        { data: { source: 'ann2', target: 'jeni2' }},
-      ],
+      //   { data: { source: 'ann', target: 'john' }},
+      //   { data: { source: 'ann', target: 'ses' }},
+      //   { data: { source: 'ann', target: 'jeni' }},
+
+      //   { data: { source: 'ann2', target: 'john2' }},
+      //   { data: { source: 'ann2', target: 'ses2' }},
+      //   { data: { source: 'ann2', target: 'jeni2' }},
+      // ],
 
       style: [
         {
@@ -67,17 +123,18 @@ addEventListener("DOMContentLoaded",()=>{
         name: 'breadthfirst',
         directed: true,
         padding: 30,
-        spacingFactor: 1.5,
+        spacingFactor: 0.5,
         orientation: 'horizontal' // Top → Bottom
       },
        //  Control zoom behavior
-      minZoom: 0.5,   //  minimum zoom allowed 
+      //minZoom: 0.5,   //  minimum zoom allowed 
       maxZoom: 5,     //  maximum zoom allowed
       wheelSensitivity: 0.2 // smoother scroll zoom
     });
 // Create HTML cards for each node
 cy.nodes().forEach(node => {
    const d = node.data();
+   console.log(d)
   const card = document.createElement('div');
   card.className = "card absolute w-full rounded-lg p-2 bg-gray-300";
    
@@ -103,6 +160,7 @@ cy.nodes().forEach(node => {
     // Example: show in a side panel
       const detailsBox = document.getElementById('details');
     detailsBox.classList.remove("hidden");
+    detailsBox.classList.add("p-4", "rounded-lg", "shadow-lg", "bg-white");
     detailsBox.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
       <img class="w-full h-auto rounded" src="${d.photo}" alt="photo">
@@ -117,18 +175,107 @@ cy.nodes().forEach(node => {
       <div class="flex flex-row gap-1"><label>location:</label><p>uthiru</p></div>
       
     </div>
+    <!-- RELATIONSHIP CONTROLS -->
+  <div class="mt-4 p-2 border-t border-gray-300">
+    <h4 class="font-semibold text-sm mb-2 text-center">Add Relationship</h4>
+    <div class="flex flex-col space-y-2">
+      <label for="directionSelect" class="text-xs font-medium">Select direction:</label>
+      <select id="directionSelect" class="border border-gray-400 rounded px-2 py-1 text-xs">
+        <option value="">-- Choose direction --</option>
+        <option value="forward">Forward</option>
+        <option value="backward">Backward</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col space-y-2 mt-2">
+      <label for="relationSelect" class="text-xs font-medium">Select Relationship:</label>
+      <select id="relationSelect" class="border border-gray-400 rounded px-2 py-1 text-xs">
+        <option value="">-- Choose relationship --</option>
+      </select>
+
+      <button id="addMemberBtn" 
+              class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-xs">
+         Add Member
+      </button>
+    </div>
+  </div>
     <div class="w-full flex justify-center mt-3">
     <button id="closeDetails" 
-            class="bg-green-500 hover:bg-green-400 text-white rounded px-3 py-1 text-sm">
+            class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-sm">
       Close
     </button>
   </div>
     `;
+    // Logic: Change available relationships dynamically
+const directionSelect = detailsBox.querySelector("#directionSelect");
+const relationSelect = detailsBox.querySelector("#relationSelect");
+let transientState=false;
+directionSelect.addEventListener("change", (e) => {
+  const dir = e.target.value;
+  relationSelect.innerHTML = ""; // clear old options
+
+  let options = [];
+
+  if (dir === "forward") {
+    transientState=true;
+    options = [
+      { value: "default", text: "--default--" },
+      { value: "wife", text: "Wife" },
+      { value: "husband", text: "Husband" },
+      { value: "child", text: "Child" },
+    ];
+  } else if (dir === "backward") {
+    transientState=true;
+    options = [
+      { value: "default", text: "--default--" },
+      { value: "mother", text: "Mother" },
+      { value: "father", text: "Father" },
+      { value: "other", text: "Other" },
+    ];
+  } else {
+    transientState=false;
+    options = [{ value: "", text: "-- Choose relationship --" }];
+  }
+
+  // repopulate dropdown
+  options.forEach(opt => {
+    const optionEl = document.createElement("option");
+    optionEl.value = opt.value;
+    optionEl.textContent = opt.text;
+    relationSelect.appendChild(optionEl);
+  });
+});
+
     const closeBtn = detailsBox.querySelector("#closeDetails");
   closeBtn.addEventListener("click", () => {
     detailsBox.classList.add("hidden");
   });
+  //adnew member branch
+  
+  addMemberBtn.addEventListener("click", () => {
+    
+    //transer data to ad m ember form
+    console.log(d.id);
+    if(transientState==true && relationSelect.value!= "default"){
+      newmemberData.classList.remove("hidden");
+      const connectionNode = document.querySelector("#connectionNode");
+      const connectionUnid = document.querySelector("#connectionUnid");
+      const connectionContinumRelationship = document.querySelector("#connectionContinumRelationship");
+      const connectionDirection = document.querySelector("#connectionDirection");
+      connectionNode.value=d.treeId;
+      connectionUnid.value=d.id;
+      connectionContinumRelationship.value=relationSelect.value;
+      connectionDirection.value=directionSelect.value;
+    }else{
+      showTimedAlert({
+        alertMessage,
+        message: "choose relationship " ,
+        addMemberBtn,
+      });
+    }
   });
+  });
+  //get data and move foward to add member
    //store reference
   nodeCards[node.id()] = card;
 
@@ -198,4 +345,100 @@ cy.on('zoom pan render', ()=>{
   }
 });
 updateCardPositions(); // initial render
+//member add form 
+  addNewMemberBtn.addEventListener("click",e=>{
+      console.log(connectionUnid.value,connectionContinumRelationship.value,connectionDirection.value)
+    if(newMembernickName.value=="" && newmembersname.value==""){
+        showAlert({
+        alertMessage,
+        message: "Please enter at least a nickname or name." ,
+        addNewMemberBtn,
+      });
+    }else{
+        async function addnewmemberFunction() {
+                const csrtfTokenValue = csrtfTokenid.value;
+
+                const newmembersname = document.querySelector("#newmembersname");
+                const newMemberidNumber = document.querySelector("#newMemberidNumber");
+                const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
+                const newMemberdied = document.querySelector("#newMemberdied");
+                const newMembernickName = document.querySelector("#newMembernickName");
+                const postData ={
+                    addnewMemberStatus:true,
+                    newmembersname:sanitize(newmembersname.value),
+                    newMemberidNumber:sanitize(newMemberidNumber.value),
+                    newMemberdied:sanitize(newMemberdied.value),
+                    newMemberbirthDate:sanitize(newMemberbirthDate.value),
+                    newMembernickName:sanitize(newMembernickName.value),
+                    connectionNode:sanitize(connectionNode.value),
+                    connectionUnid:sanitize(connectionUnid.value),
+                    connectionContinumRelationship:sanitize(connectionContinumRelationship.value),
+                    connectionDirection:sanitize(connectionDirection.value),
+                    csrtfToken:sanitize(csrtfTokenValue)
+                };
+                console.log(postData)
+             const response = await fetch('insertData.php',{
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify(postData)
+             });
+             const text = await response.text();
+             console.log(text);
+             try{
+                const result = JSON.parse(text);
+               // console.log(result);
+                if(result.success){
+                    //login success
+                    addNewNodeBtn.disabled="true";
+                    p.textContent = result.message;
+                    alertMessage.classList.remove("hidden");
+                    alertMessage.classList.add("flex","animate-slide-down");
+                    setTimeout(() => {
+                        alertMessage.classList.remove("animate-slide-down");
+                        alertMessage.classList.add("animate-slide-up");
+                    }, 2000);
+                    //close modal and clear content
+                    setTimeout(()=>{
+                        alertMessage.classList.add("hidden");
+                        alertMessage.classList.remove("flex");
+                        addNewMemberBtn.disabled=false;
+                        alertMessage.classList.remove("animate-slide-down","animate-slide-up");
+
+                    },2400);
+                    setTimeout(()=>{
+                       // window.location.href="admin/admin.php";
+                       newNodeData.classList.add("hidden");
+                    },2500);
+                    showTimedAlert({
+                      alertMessage,
+                      message: result.message,
+                      addNewMemberBtn,
+                      url:""
+                    });
+                }else{
+                  showAlert({
+                    alertMessage,
+                    message: result.message,
+                    addNewMemberBtn,
+                  });
+                }
+             }
+             catch(jsonErr){
+                console.log("response error:" + jsonErr);
+             }
+          }
+          addnewmemberFunction();
+    }
+  });
+
+
+
+  isDeceasednewMember.addEventListener('change', () => {
+    if (isDeceasednewMember.checked) {
+      newMemberdeathContainer.classList.remove('hidden');
+    } else {
+      newMemberdeathContainer.classList.add('hidden');
+      document.getElementById('died').value = ''; // clear value if unchecked
+    }
+  });
 });

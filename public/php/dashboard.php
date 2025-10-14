@@ -28,7 +28,7 @@
 </head>
 <body class="overflow-hidden">
     <!--alert message-->
-   <div id="alertMessage" class="fixed z-50 left-1/2 -translate-x-1/2 bg-red hidden bg-orange-300 mt-2 rounded-lg shadow-xl px-3 py-1 gap-1 ">
+   <div id="alertMessage" class="fixed z-[60] left-1/2 -translate-x-1/2 bg-red hidden bg-orange-300 mt-2 rounded-lg shadow-xl px-3 py-1 gap-1 ">
        <i class="ri-error-warning-fill text-xl"></i>
        <p>alert message</p>
    </div>
@@ -50,7 +50,7 @@
   </div>
 <!-- Add Tree Button -->
 <button class="ml-4">
-  <i class="ri-add-line text-xl  bg-green-500 hover:bg-green-400 text-white rounded-full  shadow-lg"></i>
+  <i id="addnewNode" class="ri-add-line text-xl  bg-green-500 hover:bg-green-400 text-white rounded-full  shadow-lg"></i>
 </button>
 
   <!-- Right: User Menu -->
@@ -75,10 +75,107 @@
 
 
 
-<div id="details" class="fixed hidden top-1/3 left-1/2 -translate-x-1/2 z-50 max-w-lg bg-slate-100  rounded-lg shadow-lg p-4">
-      
+<div id="details" class="fixed hidden top-1/3 left-1/2 -translate-x-1/2 z-50 max-w-lg  bg-slate-100  rounded-lg shadow-lg overflow-y-auto">   
 </div>
- <script src="../js/chart.js"></script>
+<div id="newNodeData" class="hidden fixed flex flex-col justify-center items-center  z-50  w-full h-screen p-4">
+  <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+        <div class="flex flex-row space-y-2 ">
+          <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Family tree</h2>
+          <i id="closeNodedata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Photo</label>
+          <input type="file" id="memberPhoto" name="img" accept="image/jpeg, image/png, image/jpg" class="border rounded p-2">
+          <img id="preview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Name</label>
+          <input id="name" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">ID</label>
+          <input id="idNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Born (Sunrise)</label>
+          <input id="birthDate" type="date"  class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+          <!-- Deceased toggle -->
+      <div class="flex items-center gap-2 mb-2">
+        <input type="checkbox" id="isDeceased" class="w-4 h-4 text-green-500 border-gray-300 rounded">
+        <label for="isDeceased" class="text-gray-700">Deceased</label>
+      </div>
+
+      <!-- Date of death (hidden by default) -->
+      <div id="deathContainer" class="flex flex-col gap-2 mb-2 hidden">
+        <label for="died">Passed Away (Sunset)</label>
+        <input type="date" id="died" class="px-2 py-1 rounded-lg outline-none border">
+      </div>
+      <div class="flex flex-col gap-2">
+          <label for="img">nick name</label>
+          <input id="nickName" type="text" placeholder="mama or baba ann" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2 m-4  text-center  mx-auto">
+          <button id="addNewNodeBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Add</button>
+        </div>
+    </div>
+        
+  </div>
+<div id="newmemberData" class="hidden fixed flex flex-col justify-center items-center  z-50  w-full h-screen p-4">
+  <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+        <div class="flex flex-row space-y-2 ">
+          <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Add member</h2>
+          <i id="closenewmemberdata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
+        </div>
+        <div>
+          <input type="hidden" id="connectionNode" value=""/>
+          <input type="hidden" id="connectionUnid" value=""/>
+          <input type="hidden" id="connectionContinumRelationship" value=""/>
+          <input type="hidden" id="connectionDirection" value=""/>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Photo</label>
+          <input type="file" id="newmemberPhoto" name="img" accept="image/jpeg, image/png, image/jpg" class="border rounded p-2">
+          <img id="newMemberpreview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Name</label>
+          <input id="newmembersname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">ID</label>
+          <input id="newMemberidNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Born (Sunrise)</label>
+          <input id="newMemberbirthDate" type="date"  class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+          <!-- Deceased toggle -->
+      <div class="flex items-center gap-2 mb-2">
+        <input type="checkbox" id="isDeceasednewMember" class="w-4 h-4 text-green-500 border-gray-300 rounded">
+        <label for="isDeceased" class="text-gray-700">Deceased</label>
+      </div>
+
+      <!-- Date of death (hidden by default) -->
+      <div id="newMemberdeathContainer" class="flex flex-col gap-2 mb-2 hidden">
+        <label for="died">Passed Away (Sunset)</label>
+        <input type="date" id="newMemberdied" class="px-2 py-1 rounded-lg outline-none border">
+      </div>
+      <div class="flex flex-col gap-2">
+          <label for="img">nick name</label>
+          <input id="newMembernickName" type="text" placeholder="mama or baba ann" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2 m-4  text-center  mx-auto">
+          <button id="addNewMemberBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Add</button>
+        </div>
+    </div>
+        
+  </div>
+ <script src="../js/csrf.js"></script>
+ <script type="module" src="../js/chart.js"></script>
  <script src="../js/main.js"></script>
+ <script  src="../js/addMember.js"></script>
 </body>
 </html>
