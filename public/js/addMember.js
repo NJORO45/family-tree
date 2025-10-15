@@ -1,3 +1,5 @@
+import { showTimedAlert } from './utilities/alerthandler.js';
+import { showAlert } from './utilities/alerthandler.js';
 function sanitize(input) {
     if (typeof input !== "string") return input;
 
@@ -24,6 +26,7 @@ addEventListener("DOMContentLoaded",()=>{
     const closeNodedata = document.querySelector("#closeNodedata");
     const addnewNode = document.querySelector("#addnewNode");
     const newNodeData = document.querySelector("#newNodeData");
+    const role = document.querySelector("#role");
     const addNewNodeBtn = document.querySelector("#addNewNodeBtn");
     const memberPhoto = document.querySelector("#memberPhoto");
     const preview = document.querySelector("#preview");
@@ -58,19 +61,11 @@ addEventListener("DOMContentLoaded",()=>{
   });
   addNewNodeBtn.addEventListener("click",e=>{
     if(nickName.value=="" && name.value==""){
-        p.textContent ="Please enter at least a nickname or name.";
-        alertMessage.classList.remove("hidden");
-        alertMessage.classList.add("flex");
-        addNewNodeBtn.disabled=false;
-        alertMessage.classList.add("animate-slide-down");
-        setTimeout(() => {
-            alertMessage.classList.remove("animate-slide-down");
-            alertMessage.classList.add("animate-slide-up");
-        }, 2000);
-        setTimeout(() => {
-            alertMessage.classList.add("hidden","animate-slide-down");
-            alertMessage.classList.remove("flex","animate-slide-up");
-        }, 2400);
+        showAlert({
+        alertMessage,
+        message: "Please enter at least a nickname or name." ,
+        addNewMemberBtn,
+      });
     }else{
         async function addnewNodeFunction() {
                 const csrtfTokenValue = csrtfTokenid.value;
@@ -79,6 +74,7 @@ addEventListener("DOMContentLoaded",()=>{
                 const birthDate = document.querySelector("#birthDate");
                 const died = document.querySelector("#died");
                 const nickName = document.querySelector("#nickName");
+                const role = document.querySelector("#role");
                 const postData ={
                     addNodeStatus:true,
                     name:sanitize(name.value),
@@ -86,13 +82,25 @@ addEventListener("DOMContentLoaded",()=>{
                     died:sanitize(died.value),
                     birthDate:sanitize(birthDate.value),
                     nickName:sanitize(nickName.value),
+                    role:sanitize(role.value),
                     csrtfToken:sanitize(csrtfTokenValue)
                 };
-                console.log(postData)
+                 // Now create FormData and add all fields
+                const formData = new FormData();
+
+                for (const key in postData) {
+                formData.append(key, postData[key]);
+                }
+
+                // Add file if available
+                if (memberPhoto.files[0]) {
+                formData.append("photo", memberPhoto.files[0]);
+                }
+                console.log(formData)
              const response = await fetch('insertData.php',{
                 method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify(postData)
+                // headers:{"Content-Type":"multipart/form-data"},
+                body:formData
              });
              const text = await response.text();
              console.log(text);
@@ -101,42 +109,19 @@ addEventListener("DOMContentLoaded",()=>{
                // console.log(result);
                 if(result.success){
                     //login success
-                    addNewNodeBtn.disabled="true";
-                    p.textContent = result.message;
-                    alertMessage.classList.remove("hidden");
-                    alertMessage.classList.add("flex","animate-slide-down");
-                    setTimeout(() => {
-                        alertMessage.classList.remove("animate-slide-down");
-                        alertMessage.classList.add("animate-slide-up");
-                    }, 2000);
-                    //close modal and clear content
-                    setTimeout(()=>{
-                        alertMessage.classList.add("hidden");
-                        alertMessage.classList.remove("flex");
-                        name.value="";
-                        idNumber.value="";
-                        addNewNodeBtn.disabled=false;
-                        alertMessage.classList.remove("animate-slide-down","animate-slide-up");
-
-                    },2400);
-                    setTimeout(()=>{
-                       // window.location.href="admin/admin.php";
-                       newNodeData.classList.add("hidden");
-                    },2500);
+                    showTimedAlert({
+                      alertMessage,
+                      message: result.message,
+                      addNewNodeBtn,
+                      newNodeData,
+                      url:""
+                    });
                 }else{
-                     p.textContent = result.message;
-                    alertMessage.classList.remove("hidden");
-                    alertMessage.classList.add("flex");
-                    addNewNodeBtn.disabled=false;
-                    alertMessage.classList.add("animate-slide-down");
-                    setTimeout(() => {
-                        alertMessage.classList.remove("animate-slide-down");
-                        alertMessage.classList.add("animate-slide-up");
-                    }, 2000);
-                    setTimeout(() => {
-                        alertMessage.classList.add("hidden","animate-slide-down");
-                        alertMessage.classList.remove("flex","animate-slide-up");
-                    }, 2400);
+                    showAlert({
+                        alertMessage,
+                        message: result.message ,
+                        addNewMemberBtn,
+                    });
                 }
              }
              catch(jsonErr){

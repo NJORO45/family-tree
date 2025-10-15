@@ -2,6 +2,23 @@
 import { showTimedAlert } from './utilities/alerthandler.js';
 import { showAlert } from './utilities/alerthandler.js';
 const nodeCards = {}; // 🔹 global dictionary to store node.id() → card element
+function sanitize(input) {
+    if (typeof input !== "string") return input;
+
+    const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+        "`": "&#96;"
+    };
+
+    return input
+        .trim()
+        .replace(/[&<>"'`]/g, match => map[match])
+        .replace(/\r?\n|\r/g, " "); // normalize newlines
+}
 async function getdataFunction() {
            
             const response = await fetch('getdata.php',{
@@ -29,6 +46,16 @@ async function getdataFunction() {
               return [];
             }
 }
+function supportsWebP() {
+  try {
+    return document.createElement('canvas')
+      .toDataURL('image/webp')
+      .indexOf('data:image/webp') === 0;
+  } catch (err) {
+    return false;
+  }
+}
+
 addEventListener("DOMContentLoaded",async()=>{
 
   const newmemberData = document.querySelector("#newmemberData");
@@ -143,7 +170,8 @@ cy.nodes().forEach(node => {
   card.style.transition = "transform 0.1s ease-out, width 0.1s ease-out, height 0.1s ease-out";
   card.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
-      <img class="w-full h-auto rounded" src="${node.data('photo')}" alt="">
+      <img class="w-full h-auto rounded" src="${supportsWebP() ? d.photo_webp : d.photo_jpg}" 
+         alt="${d.name}" >
     </div>
     <div class="flex flex-col space-y-1 text-xs mt-1">
       <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>Name:</label><p>${node.data('name')}</p></div>
@@ -159,12 +187,15 @@ cy.nodes().forEach(node => {
     console.log("Read more clicked for:", d.name);
 
     // Example: show in a side panel
+      const detailscontainer = document.getElementById('detailscontainer');
       const detailsBox = document.getElementById('details');
+    detailscontainer.classList.remove("hidden");
     detailsBox.classList.remove("hidden");
     detailsBox.classList.add("p-4", "rounded-lg", "shadow-lg", "bg-white");
     detailsBox.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
-      <img class="w-full h-auto rounded" src="${d.photo}" alt="photo">
+      <img class="w-full h-auto rounded" src="${supportsWebP() ? d.photo_webp : d.photo_jpg}" 
+         alt="${d.name}">
     </div>
     <div class="flex flex-col space-y-1 text-xs mt-1">
       <div class="flex flex-row gap-1"><label>Name:</label><p>${d.name}</p></div>
@@ -251,6 +282,17 @@ directionSelect.addEventListener("change", (e) => {
     const closeBtn = detailsBox.querySelector("#closeDetails");
   closeBtn.addEventListener("click", () => {
     detailsBox.classList.add("hidden");
+    detailscontainer.classList.add("hidden");
+  });
+    newmemberPhoto.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      newMemberpreview.src = URL.createObjectURL(file);
+      newMemberpreview.classList.remove("hidden");
+    }else{
+        newMemberpreview.src="";
+        newMemberpreview.classList.add("hidden");
+    }
   });
   //adnew member branch
   
@@ -299,44 +341,39 @@ directionSelect.addEventListener("change", (e) => {
 
     //updateCardPositions(); // initial render
 function updateCardPositions() {
-  const zoom = cy.zoom(); // current zoom level
+  const zoom = cy.zoom();
+  const pan = cy.pan();
+
   cy.nodes().forEach(node => {
     const pos = node.renderedPosition();
     const card = nodeCards[node.id()];
-    // Debug check
-    if (!card) {
-      console.warn(`No card found for node: ${node.id()}`);
-      return; // skip if missing
-    }
+    if (!card) return;
 
-    //  If detected, log one-time info
-    //  position card
-    card.style.left = pos.x + 'px';
-    card.style.top = pos.y + 'px';
+    // Ensure the card centers on the node
+    card.style.left = `${pos.x}px`;
+    card.style.top = `${pos.y}px`;
 
-    // calculate dynamic scale factor
-    // when zoom = 1 → normal size
-    // when zoom > 1 → slightly smaller
-    // when zoom < 1 → slightly bigger
-    const scale = Math.max(0.5, Math.min(1.2, 1 / zoom));
-   // Adjust card size based on scale range
-    if (scale >= 1.2) {
-      const baseWidth = 80;  // your default card width
-      // when zoomed out too far, shrink less aggressively
+    // Apply zoom scaling to the card itself (instead of resizing width manually)
+    card.style.transform = `translate(-50%, -50%) scale(${zoom})`;
+    card.style.transformOrigin = "center center";
+console.log(zoom)
+    // Hide images when too small
+    if (zoom < 0.7) {
       card.querySelector("img").style.display = "none";
+      const baseWidth = 200;  // your default card width
       card.style.width = `${baseWidth }px`;
-      
     } else {
-      const baseWidth = 140;  // your default card width
-      // when zoomed in or normal zoom, scale normally
       card.querySelector("img").style.display = "block";
-      card.style.width = `${baseWidth}px`;
+      const baseWidth = 140;  // your default card width
+      card.style.width = `${baseWidth }px`;
     }
-    // apply transform
-    card.style.transform = `translate(-50%, -50%) `;
-  
+
+    // Optional: reduce text font size slightly as zoom decreases
+    const textSize = Math.max(8, 10 * zoom);
+    card.style.fontSize = `${textSize}px`;
   });
 }
+
 let lastUpdate = 0;
 // update on zoom/pan/render
 cy.on('zoom pan render', ()=>{
@@ -359,7 +396,7 @@ updateCardPositions(); // initial render
     }else{
         async function addnewmemberFunction() {
                 const csrtfTokenValue = csrtfTokenid.value;
-
+               // console.log(csrtfTokenValue)
                 const newmembersname = document.querySelector("#newmembersname");
                 const newMemberidNumber = document.querySelector("#newMemberidNumber");
                 const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
@@ -378,11 +415,20 @@ updateCardPositions(); // initial render
                     connectionDirection:sanitize(connectionDirection.value),
                     csrtfToken:sanitize(csrtfTokenValue)
                 };
-                console.log(postData)
+                const formData = new FormData();
+
+                for (const key in postData) {
+                formData.append(key, postData[key]);
+                }
+
+                // Add file if available
+                if (newmemberPhoto.files[0]) {
+                formData.append("photo", newmemberPhoto.files[0]);
+                }
+                
              const response = await fetch('insertData.php',{
                 method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify(postData)
+                body:formData
              });
              const text = await response.text();
              console.log(text);
@@ -391,26 +437,6 @@ updateCardPositions(); // initial render
                // console.log(result);
                 if(result.success){
                     //login success
-                    addNewNodeBtn.disabled="true";
-                    p.textContent = result.message;
-                    alertMessage.classList.remove("hidden");
-                    alertMessage.classList.add("flex","animate-slide-down");
-                    setTimeout(() => {
-                        alertMessage.classList.remove("animate-slide-down");
-                        alertMessage.classList.add("animate-slide-up");
-                    }, 2000);
-                    //close modal and clear content
-                    setTimeout(()=>{
-                        alertMessage.classList.add("hidden");
-                        alertMessage.classList.remove("flex");
-                        addNewMemberBtn.disabled=false;
-                        alertMessage.classList.remove("animate-slide-down","animate-slide-up");
-
-                    },2400);
-                    setTimeout(()=>{
-                       // window.location.href="admin/admin.php";
-                       newNodeData.classList.add("hidden");
-                    },2500);
                     showTimedAlert({
                       alertMessage,
                       message: result.message,

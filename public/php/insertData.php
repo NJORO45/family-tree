@@ -18,50 +18,124 @@ date_default_timezone_set("Africa/Nairobi");
 header('Content-Type:application/json');
 include("db_connect.php");
 include("functions.php");
-$data = json_decode(file_get_contents("php://input"), true);
+//$data = json_decode(file_get_contents("php://input"), true);
 // CSRF check
-if (!$data || !isset($data['csrtfToken']) || $data['csrtfToken'] !== $_SESSION['csrf_token']) {
-    echo json_encode(["success" => false, "message" => !$data ? "Invalid JSON" : "CSRF validation failed" . $_SESSION['csrf_token']]);
+if ( !isset($_POST['csrtfToken']) || $_POST['csrtfToken'] !== $_SESSION['csrf_token']) {
+    echo json_encode(["success" => false, "message" =>  "CSRF validation failed.". $_SESSION['csrf_token']]);
     exit;
 }
 
-if(isset($data['addNodeStatus']) && $data['addNodeStatus']==true){
+if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
     $treeId= "node". random_num(6);
     $memberUnid=  random_num(6);
-    $name = sanitize($data['name']);
-    $idNumber = sanitize($data['idNumber']);
-    $birthDate = sanitize($data['birthDate']);
-    $died = sanitize($data['died']);
-    $nickName = sanitize($data['nickName']);
+    $name = sanitize($_POST['name']);
+    $idNumber = sanitize($_POST['idNumber']);
+    $birthDate = sanitize($_POST['birthDate']);
+    $died = sanitize($_POST['died']);
+    $nickName = sanitize($_POST['nickName']);
+    $role = sanitize($_POST['role']);
+    $uploadDir = "../../uploads/";
+    $photoPathJPG = "";
+    $photoPathWEBP = "";
+    //  Handle file upload if exists
+    /*
+    if shows error Call to undefined function imagecreatefrompng()
+    Here’s how to fix it:
+
+    Open your PHP configuration file
+
+    In XAMPP, it’s usually here:
+
+    D:\program files\xamp\php\php.ini
+
+
+    Find this line (it’s commented out by default):
+
+    ;extension=gd
+
+
+    Uncomment it (remove the ; at the beginning):
+
+    extension=gd
+
+
+    Restart Apache from your XAMPP control panel.
+    (This step is required for changes to take effect.)
+    */
+if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
+    $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+    $newFileName = uniqid("img_") . '.' . $ext;
+    $photoPathJPG = $uploadDir . $newFileName;
+
+    if (move_uploaded_file($_FILES['photo']['tmp_name'], $photoPathJPG)) {
+        //  Convert uploaded image to WebP
+        $photoPathWEBP = $uploadDir . pathinfo($newFileName, PATHINFO_FILENAME) . ".webp";
+
+        if (convertToWebP($photoPathJPG, $photoPathWEBP, 80)) {
+            // Optional: you can remove the original if you only want the WebP
+            // unlink($photoPath);
+        } else {
+            error_log(" WebP conversion failed for: $photoPathJPG");
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "File upload failed"]);
+        exit;
+    }
+}
+
     
-    //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`)
+    // //prepare insert data
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
     VALUES
-    (?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName);
+    (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$role,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         echo json_encode(["success"=>true,"message"=>"success"]);
     }else{
         echo json_encode(["success"=>false,"message"=>"t"]);
     }
 }
-if(isset($data['addnewMemberStatus']) && $data['addnewMemberStatus']==true){
-    $treeId= sanitize($data['connectionNode']);
-    $connectionUnid= sanitize($data['connectionUnid']);
+if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
+    $treeId= sanitize($_POST['connectionNode']);
+    $connectionUnid= sanitize($_POST['connectionUnid']);
     $memberUnid=  random_num(6);
-    $name = sanitize($data['newmembersname']);
-    $idNumber = sanitize($data['newMemberidNumber']);
-    $birthDate = sanitize($data['newMemberbirthDate']);
-    $died = sanitize($data['newMemberdied']);
-    $nickName = sanitize($data['newMembernickName']);
-    $connectionContinumRelationship = sanitize($data['connectionContinumRelationship']);
-    $connectionDirection = sanitize($data['connectionDirection']);
-    
+    $name = sanitize($_POST['newmembersname']);
+    $idNumber = sanitize($_POST['newMemberidNumber']);
+    $birthDate = sanitize($_POST['newMemberbirthDate']);
+    $died = sanitize($_POST['newMemberdied']);
+    $nickName = sanitize($_POST['newMembernickName']);
+    $connectionContinumRelationship = sanitize($_POST['connectionContinumRelationship']);
+    $connectionDirection = sanitize($_POST['connectionDirection']);
+    $uploadDir = "../../uploads/";
+    $photoPathJPG = "";
+    $photoPathWEBP = "";
+
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
+    $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+    $newFileName = uniqid("img_") . '.' . $ext;
+    $photoPathJPG = $uploadDir . $newFileName;
+
+    if (move_uploaded_file($_FILES['photo']['tmp_name'], $photoPathJPG)) {
+        //  Convert uploaded image to WebP
+        $photoPathWEBP = $uploadDir . pathinfo($newFileName, PATHINFO_FILENAME) . ".webp";
+
+        if (convertToWebP($photoPathJPG, $photoPathWEBP, 80)) {
+            // Optional: you can remove the original if you only want the WebP
+            // unlink($photoPath);
+        } else {
+            error_log(" WebP conversion failed for: $photoPathJPG");
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "File upload failed"]);
+        exit;
+    }
+}
+
     //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
     VALUES
-    (?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship);
+    (?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         //echo json_encode(["success"=>true,"message"=>"success"]);
         //check if connetion is forawd or backwards
@@ -89,4 +163,7 @@ if(isset($data['addnewMemberStatus']) && $data['addnewMemberStatus']==true){
         echo json_encode(["success"=>false,"message"=>"t"]);
     }
 }
+
+
+
 ?>

@@ -75,7 +75,9 @@
 
 
 
-<div id="details" class="fixed hidden top-1/3 left-1/2 -translate-x-1/2 z-50 max-w-lg  bg-slate-100  rounded-lg shadow-lg overflow-y-auto">   
+<div id="detailscontainer" class="fixed hidden   flex flex-col justify-center w-full h-screen items-center z-50 overflow-y-auto">
+  <div id="details" class=" hidden  flex flex-col justify-center w-full z-50 max-w-sm md:max-w-md  bg-slate-100  rounded-lg shadow-lg overflow-y-auto">   
+</div>
 </div>
 <div id="newNodeData" class="hidden fixed flex flex-col justify-center items-center  z-50  w-full h-screen p-4">
   <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
@@ -115,6 +117,10 @@
       <div class="flex flex-col gap-2">
           <label for="img">nick name</label>
           <input id="nickName" type="text" placeholder="mama or baba ann" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+         <div class="flex flex-col gap-2">
+          <label for="img">Role</label>
+          <input id="role" type="text" placeholder="Father, Mother or Child" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2 m-4  text-center  mx-auto">
           <button id="addNewNodeBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Add</button>
@@ -176,6 +182,6 @@
  <script src="../js/csrf.js"></script>
  <script type="module" src="../js/chart.js"></script>
  <script src="../js/main.js"></script>
- <script  src="../js/addMember.js"></script>
+ <script type="module"  src="../js/addMember.js"></script>
 </body>
 </html>

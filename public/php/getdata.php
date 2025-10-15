@@ -31,6 +31,8 @@ while($row=$results->fetch_assoc()){
             "name" => $row["name"],
             "nickname" => $row["nickName"],
             "role" => $row["role"],
+            "photo_webp" => $row["photo_webp"],
+            "photo_jpg" => $row["photo_jpg"],
         ]
     ];
 }

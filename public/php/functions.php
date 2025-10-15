@@ -15,4 +15,33 @@ function random_num($length){
 	}
 	return $text;
 }
+function convertToWebP($input, $output, $quality = 80) {
+    $ext = strtolower(pathinfo($input, PATHINFO_EXTENSION));
+    $image = null;
+
+    switch ($ext) {
+        case 'jpg':
+        case 'jpeg':
+        case 'jfif':
+            $image = imagecreatefromjpeg($input);
+            break;
+        case 'png':
+            $image = imagecreatefrompng($input);
+            break;
+        case 'gif':
+            $image = imagecreatefromgif($input);
+            break;
+        default:
+            return false; // Unsupported format
+    }
+
+    if (!$image) {
+        return false;
+    }
+
+    // Create WebP file
+    $result = imagewebp($image, $output, $quality);
+    imagedestroy($image);
+    return $result;
+}
 ?>
