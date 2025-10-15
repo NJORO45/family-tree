@@ -66,7 +66,7 @@ export function showTimedAlert({
     if (url && url !== "") {
       window.location.href = url; // go to given page
     } else {
-      window.location.reload(); // reload same page
+      //window.location.reload(); // reload same page
     }
   }, 2500);
 }

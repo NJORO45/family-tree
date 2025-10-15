@@ -58,10 +58,10 @@ if(isset($data['addnewMemberStatus']) && $data['addnewMemberStatus']==true){
     $connectionDirection = sanitize($data['connectionDirection']);
     
     //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`)
     VALUES
-    (?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName);
+    (?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship);
     if($stmt->execute()){
         //echo json_encode(["success"=>true,"message"=>"success"]);
         //check if connetion is forawd or backwards

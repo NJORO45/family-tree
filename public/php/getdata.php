@@ -30,6 +30,7 @@ while($row=$results->fetch_assoc()){
             "id" => $row["memberUnid"],
             "name" => $row["name"],
             "nickname" => $row["nickName"],
+            "role" => $row["role"],
         ]
     ];
 }

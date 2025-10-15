@@ -123,13 +123,13 @@ addEventListener("DOMContentLoaded",async()=>{
         name: 'breadthfirst',
         directed: true,
         padding: 30,
-        spacingFactor: 0.5,
+        spacingFactor: 2,
         orientation: 'horizontal' // Top → Bottom
       },
        //  Control zoom behavior
       //minZoom: 0.5,   //  minimum zoom allowed 
       maxZoom: 5,     //  maximum zoom allowed
-      wheelSensitivity: 0.2 // smoother scroll zoom
+     // wheelSensitivity: 1.2 // smoother scroll zoom
     });
 // Create HTML cards for each node
 cy.nodes().forEach(node => {
@@ -148,6 +148,7 @@ cy.nodes().forEach(node => {
     <div class="flex flex-col space-y-1 text-xs mt-1">
       <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>Name:</label><p>${node.data('name')}</p></div>
       <div class="flex flex-row gap-1 flex-wrap "><label class="flex flex-wrap ">Nick name:</label><p>${node.data('nickname')}</p></div>
+      <div class="flex flex-row gap-1 flex-wrap "><label class="flex flex-wrap ">role:</label><p>${node.data('role')}</p></div>
       <div  class="w-full flex justify-center md:justify-end"><button id="readMore" class="readMore cursor-pointer bg-white rounded px-2 py-1">Read More</button></div>
     </div>
   `;
@@ -168,6 +169,7 @@ cy.nodes().forEach(node => {
     <div class="flex flex-col space-y-1 text-xs mt-1">
       <div class="flex flex-row gap-1"><label>Name:</label><p>${d.name}</p></div>
       <div class="flex flex-row gap-1"><label>Nickname:</label><p>${d.nickname }</p></div>
+      <div class="flex flex-row gap-1"><label>Role:</label><p>${d.role }</p></div>
       <div class="flex flex-row gap-1"><label>Bari:</label><p>igi</p></div>
       <div class="flex flex-row gap-1"><label>ID:</label><p>35855794</p></div>
       <div class="flex flex-row gap-1"><label>Email</label><p>@gmail.com</p></div>
