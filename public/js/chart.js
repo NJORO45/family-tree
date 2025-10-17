@@ -59,8 +59,7 @@ function supportsWebP() {
 addEventListener("DOMContentLoaded",async()=>{
 
   const newmemberData = document.querySelector("#newmemberData");
-      const alertMessage = document.querySelector("#alertMessage");
-    const p = document.querySelector("p");
+    const alertMessage = document.querySelector("#alertMessage");
     const closenewmemberdata = document.querySelector("#closenewmemberdata");
     const addnewNode = document.querySelector("#addnewNode");
     const newNodeData = document.querySelector("#newNodeData");
@@ -77,11 +76,30 @@ addEventListener("DOMContentLoaded",async()=>{
     const newMemberdied = document.querySelector("#newMemberdied");
     const newMembernickName = document.querySelector("#newMembernickName");
     const csrtfTokenid = document.querySelector("#csrtfTokenid");
-
+    //edit elements
+    const editcsrtfTokenid = document.querySelector("#editcsrtfTokenid");
+    const editmemberPhoto = document.querySelector("#editmemberPhoto");
+    const editpreview = document.querySelector("#editpreview");
+    const editname = document.querySelector("#editname");
+    const editidNumber = document.querySelector("#editidNumber");
+    const editbirthDate = document.querySelector("#editbirthDate");
+    const editdied = document.querySelector("#editdied");
+    const editnickName = document.querySelector("#editnickName");
+    const editrole = document.querySelector("#editrole");
+    const isDeceasededit = document.querySelector("#isDeceasededit");
+    const deathContaineredit = document.querySelector("#deathContaineredit");
+let editnamestatus=false;
+      let editidNumberstatus=false;
+      let editbirthDatestatus=false;
+      let editdiedstatus=false;
+      let editnickNamestatus=false;
+      let editrolestatus=false;
+      let editmemberPhotostatus=false;
     closenewmemberdata.addEventListener("click",()=>{
         newmemberData.classList.add("hidden");
     });
-
+let originalData='';
+let updatedData='';
   const data =await getdataFunction();
   console.group(data);
       var cy = cytoscape({
@@ -208,6 +226,10 @@ cy.nodes().forEach(node => {
       <div class="flex flex-row gap-1"><label>location:</label><p>uthiru</p></div>
       
     </div>
+    <div class="w-full flex justify-center">
+     <button id="editMemberBtn" 
+              class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-md">Edit</button>
+    </div>
     <!-- RELATIONSHIP CONTROLS -->
   <div class="mt-4 p-2 border-t border-gray-300">
     <h4 class="font-semibold text-sm mb-2 text-center">Add Relationship</h4>
@@ -278,11 +300,203 @@ directionSelect.addEventListener("change", (e) => {
     relationSelect.appendChild(optionEl);
   });
 });
+//edit user data 
+const editMemberBtn = detailsBox.querySelector("#editMemberBtn");
+const editnodeData = document.querySelector("#editnodeData");
 
+const editpreview = document.querySelector("#editpreview");
+const editname = document.querySelector("#editname");
+const editidNumber = document.querySelector("#editidNumber");
+const editbirthDate = document.querySelector("#editbirthDate");
+const editdied = document.querySelector("#editdied");
+const editnickName = document.querySelector("#editnickName");
+const editrole = document.querySelector("#editrole");
+editMemberBtn.addEventListener("click", () => {
+    editnodeData.classList.remove("hidden");
+    //pass data
+   
+    const photoUrl = supportsWebP() && d.photo_webp
+    ? d.photo_webp
+    : d.photo_jpg;
+
+      // Check if there’s an image URL
+    if (photoUrl && photoUrl.trim() !== "") {
+      editpreview.src = photoUrl;
+      editpreview.classList.remove("hidden");  
+      console.log("empry urlff",photoUrl);
+    } else {
+      editpreview.src = "";
+      editpreview.classList.add("hidden"); 
+      console.log("empry url",photoUrl);
+    }
+    editname.value=d.name;
+    editidNumber.value=d.idNumber;
+    editbirthDate.value=d.birthDate;
+    editdied.value=d.died;
+    editnickName.value=d.nickname;
+    editrole.value=d.role;
+ originalData = {
+                editname: d.name,
+                editidNumber: d.idNumber,
+                editbirthDate: d.birthDate,
+                editdied: d.died,
+                editnickName: d.nickname,
+                editrole: d.role
+            };
+  });
     const closeBtn = detailsBox.querySelector("#closeDetails");
+    const closeeditdata = document.querySelector("#closeeditdata");
+    const saveChangesBtn = document.querySelector("#saveChangesBtn");
   closeBtn.addEventListener("click", () => {
     detailsBox.classList.add("hidden");
     detailscontainer.classList.add("hidden");
+  });
+  closeeditdata.addEventListener("click", () => {
+     editnodeData.classList.add("hidden");
+  });
+
+
+      editmemberPhoto.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          editpreview.src = URL.createObjectURL(file);
+          editpreview.classList.remove("hidden");
+          editmemberPhotostatus=true;
+        }else{
+            editpreview.src="";
+            editpreview.classList.add("hidden");
+            editmemberPhotostatus=false;
+        }
+      });
+      
+      editname.addEventListener('change', () => {
+        if(editname.value.trim()===""){
+            editnamestatus=false;
+        }else{
+            editnamestatus=true;
+        }
+      });
+      editidNumber.addEventListener('change', () => {
+        if(editidNumber.value.trim()===""){
+            editidNumberstatus=false;
+        }else{
+            editidNumberstatus=true;
+        }
+      });
+      editbirthDate.addEventListener('change', () => {
+        if(editbirthDate.value.trim()===""){
+            editbirthDatestatus=false;
+        }else{
+            editbirthDatestatus=true;
+        }
+      });
+      editdied.addEventListener('change', () => {
+        if(editdied.value.trim()===""){
+            editdiedstatus=false;
+        }else{
+            editdiedstatus=true;
+        }
+      });
+      editnickName.addEventListener('change', () => {
+        if(editnickName.value.trim()===""){
+            editnickNamestatus=false;
+        }else{
+            editnickNamestatus=true;
+        }
+      });
+      editrole.addEventListener('change', () => {
+        if(editrole.value.trim()===""){
+            editrolestatus=false;
+        }else{
+            editrolestatus=true;
+        }
+      });
+
+  saveChangesBtn.addEventListener("click",()=>{
+    console.log("savechanges clicked",editdied.value);
+    updatedData= {
+                editname: sanitize(editname.value),
+                editidNumber: sanitize(editidNumber.value),
+                editbirthDate: sanitize(editbirthDate.value) === "" 
+                ? "0000-00-00 00:00:00" : sanitize(editdied.value),
+                editdied: sanitize(editdied.value) === "" 
+                ? "0000-00-00 00:00:00" : sanitize(editdied.value),
+                editnickName: sanitize(editnickName.value),
+                editrole: sanitize(editrole.value)
+            };
+            const hasChanges = Object.keys(originalData).some(
+                key => originalData[key] !== updatedData[key]
+            );
+            if(hasChanges &&(editnamestatus || editidNumberstatus || editbirthDatestatus || editdiedstatus || editnickNamestatus || editrolestatus || editmemberPhotostatus)){
+              console.log("has changed");
+                      async function editmemberFunction() {
+               const formData = new FormData();
+
+            formData.append("editmemberStatus", true);
+            formData.append("treeId", d.treeId);
+            formData.append("userId", d.id);
+            formData.append("csrtfToken", editcsrtfTokenid.value);
+            formData.append("editname", sanitize(editname.value));
+            formData.append("editidNumber", sanitize(editidNumber.value));
+            formData.append(
+              "editbirthDate",
+              sanitize(editbirthDate.value) === "" ? "0000-00-00 00:00:00" : sanitize(editbirthDate.value)
+            );
+            formData.append(
+              "editdied",
+              sanitize(editdied.value) === "" ? "0000-00-00 00:00:00" : sanitize(editdied.value)
+            );
+            formData.append("editnickName", sanitize(editnickName.value));
+            formData.append("editrole", sanitize(editrole.value));
+
+            
+            if (editmemberPhotostatus && editmemberPhoto.files[0]) {
+              formData.append("photo", editmemberPhoto.files[0]);
+            } else {
+              formData.append("photo", ""); 
+            }
+             const response = await fetch('insertData.php',{
+                method:"POST",
+                body:formData
+             });
+             const text = await response.text();
+             console.log(text);
+             try{
+                const result = JSON.parse(text);
+               // console.log(result);
+                if(result.success){
+                    //login success
+                    showTimedAlert({
+                      alertMessage,
+                      message: result.message,
+                      addNewMemberBtn,
+                      url:""
+                    });
+                }else{
+                  showAlert({
+                    alertMessage,
+                    message: result.message,
+                    saveChangesBtn,
+                  });
+                }
+             }
+             catch(jsonErr){
+                console.log("response error:" + jsonErr);
+             }
+          }
+          editmemberFunction();
+
+            }else{
+              console.log(editnamestatus,editidNumberstatus,editbirthDatestatus,editdiedstatus,editnickNamestatus,editrolestatus,editmemberPhotostatus);
+              showAlert({
+                alertMessage,
+                message: "Add some changes ather than photo" ,
+                saveChangesBtn,
+              });
+            }
+            console.log("original data:",originalData);
+            console.log(" ");
+            console.log("updated data:",updatedData);
   });
     newmemberPhoto.addEventListener('change', (event) => {
     const file = event.target.files[0];
@@ -467,6 +681,16 @@ updateCardPositions(); // initial render
     } else {
       newMemberdeathContainer.classList.add('hidden');
       document.getElementById('died').value = ''; // clear value if unchecked
+    }
+  });
+
+      isDeceasededit.addEventListener('change', () => {
+        
+    if (isDeceasededit.checked) {
+      deathContaineredit.classList.remove('hidden');
+    } else {
+      deathContaineredit.classList.add('hidden');
+      document.getElementById('editdied').value = ''; // clear value if unchecked
     }
   });
 });

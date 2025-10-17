@@ -1,5 +1,9 @@
 
-export function showAlert(alertMessage, message, addNewNodeBtn = null) {
+export function showAlert({
+  alertMessage, 
+  message, 
+  addNewNodeBtn = null
+  }) {
   const p = alertMessage.querySelector("p") || document.createElement("p");
   p.textContent = message;
   if (!alertMessage.contains(p)) alertMessage.appendChild(p);

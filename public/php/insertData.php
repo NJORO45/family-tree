@@ -164,6 +164,54 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
     }
 }
 
+//edit member data
+if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
+    $treeId     = sanitize($_POST['treeId']);
+    $memberUnid = sanitize($_POST['userId']);
+    $name       = sanitize($_POST['editname']);
+    $idNumber   = sanitize($_POST['editidNumber']);
+    $birthDate  = sanitize($_POST['editbirthDate']);
+    $died       = sanitize($_POST['editdied']);
+    $nickName   = sanitize($_POST['editnickName']);
+    $role       = sanitize($_POST['editrole']);
 
+    $uploadDir = "../../uploads/";
+    $photoPathJPG = "";
+    $photoPathWEBP = "";
+
+    //  Check if photo file was uploaded
+    if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
+        $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
+        $newFileName = uniqid("img_") . '.' . $ext;
+        $photoPathJPG = $uploadDir . $newFileName;
+
+        if (move_uploaded_file($_FILES['photo']['tmp_name'], $photoPathJPG)) {
+            //  Convert uploaded image to WebP
+            $photoPathWEBP = $uploadDir . pathinfo($newFileName, PATHINFO_FILENAME) . ".webp";
+
+            if (!convertToWebP($photoPathJPG, $photoPathWEBP, 80)) {
+                error_log("WebP conversion failed for: $photoPathJPG");
+            }
+        } else {
+            echo json_encode(["success" => false, "message" => "File upload failed"]);
+            exit;
+        }
+
+        // Update including new photo
+        $stmt = $con->prepare("UPDATE members  SET name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=?, photo_webp=?, photo_jpg=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "ssssssssss",$name, $idNumber, $birthDate, $died, $nickName, $role, $photoPathWEBP, $photoPathJPG, $memberUnid, $treeId);
+    } else {
+        //  Update without touching photo fields
+        $stmt = $con->prepare("UPDATE members SET name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "ssssssss", $name, $idNumber, $birthDate, $died, $nickName, $role, $memberUnid, $treeId);
+    }
+
+    
+    if ($stmt->execute()) {
+        echo json_encode(["success" => true, "message" => "Member updated successfully"]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Database update failed"]);
+    }
+}
 
 ?>

@@ -179,6 +179,56 @@
     </div>
         
   </div>
+  <!-- edit  -->
+  <div id="editnodeData" class="hidden fixed flex flex-col justify-center items-center  z-50 h-screen overflow-y-auto  w-full h-screen my-4">
+  <input type="hidden" id="editcsrtfTokenid" class="csrtfToken" id="">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+        <div class="flex flex-row space-y-2 ">
+          <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Edit Member Details</h2>
+          <i id="closeeditdata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Photo</label>
+          <input type="file" id="editmemberPhoto" name="img" accept="image/jpeg, image/png, image/jpg" class="border rounded p-2">
+          <img id="editpreview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Name</label>
+          <input id="editname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">ID</label>
+          <input id="editidNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Born (Sunrise)</label>
+          <input id="editbirthDate" type="date"  class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+          <!-- Deceased toggle -->
+      <div class="flex items-center gap-2 mb-2">
+        <input type="checkbox" id="isDeceasededit" class="w-4 h-4 text-green-500 border-gray-300 rounded">
+        <label for="isDeceasededit" class="text-gray-700">Deceased</label>
+      </div>
+
+      <!-- Date of death (hidden by default) -->
+      <div id="deathContaineredit" class="flex flex-col gap-2 mb-2 hidden">
+        <label for="died">Passed Away (Sunset)</label>
+        <input type="date" id="editdied" class="px-2 py-1 rounded-lg outline-none border">
+      </div>
+      <div class="flex flex-col gap-2">
+          <label for="img">nick name</label>
+          <input id="editnickName" type="text" placeholder="mama or baba ann" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+         <div class="flex flex-col gap-2">
+          <label for="img">Role</label>
+          <input id="editrole" type="text" placeholder="Father, Mother or Child" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2 m-4  text-center  mx-auto">
+          <button id="saveChangesBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Save Changes</button>
+        </div>
+    </div>
+        
+  </div>
  <script src="../js/csrf.js"></script>
  <script type="module" src="../js/chart.js"></script>
  <script src="../js/main.js"></script>
