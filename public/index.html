@@ -35,10 +35,17 @@
                 <label for="password" class="font-medium text-gray-700">Password</label>
                 <input type="password" class="border-2 border-green-300 outline-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
-            <div class="flex flex-col">
-                <button class="bg-green-500 px-4 py-2 rounded-lg shadow-lg text-white text-xl font-semibold hover:bg-green-400 transition">login</button>
+             <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
+            <div class="flex flex-col gap-2">
+                <button id="login" class="bg-green-500 px-4 py-2 rounded-lg shadow-lg text-white text-xl font-semibold hover:bg-green-400 transition">login</button>
+                <div class="flex flex-row flex-wrap gap-2">
+                    <p>Don't have an account </p>
+                    <button id="continue" class="underline">Continue</button>
+                </div>
             </div>
         </div>
     </div>
 </body>
+ <script type="module"  src="js/outh.js"></script>
+ <script type="module"  src="js/csrf.js"></script>
 </html>

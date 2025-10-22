@@ -20,7 +20,48 @@ include("db_connect.php");
 include("functions.php");
 //get members
 $members=[];
-$stmt =$con->prepare("SELECT * FROM members");
+$relationships = [];
+// Retrieve session values safely
+$is_temp_user = isset($_SESSION['is_temp_user']) ? $_SESSION['is_temp_user'] : false;
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$guest_token = isset($_SESSION['guest_token']) ? $_SESSION['guest_token'] : null;
+
+$memberTree = null;
+
+$rank = "admin";
+
+// Stop early if user_id is missing
+if (!$user_id) {
+    echo json_encode(["success" => false, "message" => "User not logged in"]);
+    exit;
+}
+
+if ($is_temp_user) {
+    // Guest users
+    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ? AND rank = ? AND guest_token = ? LIMIT 1");
+    $query->bind_param("sss", $user_id, $rank, $guest_token);
+} else {
+    // Permanent users
+    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ? AND rank = ? LIMIT 1");
+    $query->bind_param("ss", $user_id, $rank);
+}
+
+$query->execute();
+$result = $query->get_result();
+
+if ($result && $result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $memberTree = $row['treeLink'];
+    //echo json_encode(["success" => true, "treeId" => $memberTree]);
+} else {
+    exit();
+   // echo json_encode(["success" => false, "message" => "No tree linked yet."]);
+}
+
+
+
+$stmt =$con->prepare("SELECT * FROM members WHERE treeId= ?");
+$stmt ->bind_param("s",$memberTree);
 $stmt->execute();
 $results = $stmt->get_result();
 while($row=$results->fetch_assoc()){
@@ -40,9 +81,11 @@ while($row=$results->fetch_assoc()){
     ];
 }
 // get relationships
-$relationships = [];
-$result = $con->query("SELECT * FROM relationships");
-while($row = $result->fetch_assoc()) {
+$rel = $con->prepare("SELECT source, target FROM relationships WHERE treeId = ?");
+$rel->bind_param("s", $memberTree);
+$rel->execute();
+$relResults = $rel->get_result();
+while($row = $relResults->fetch_assoc()) {
     $relationships[] = [
         "data" => [
             "source" => $row["source"],

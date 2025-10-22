@@ -24,9 +24,43 @@ if ( !isset($_POST['csrtfToken']) || $_POST['csrtfToken'] !== $_SESSION['csrf_to
     echo json_encode(["success" => false, "message" =>  "CSRF validation failed.". $_SESSION['csrf_token']]);
     exit;
 }
-
-if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
+if(isset($_POST['guest_continuemStatus']) && $_POST['guest_continuemStatus'] ==true ){
+    if (empty($_SESSION['guest_continuem'])) {
+    $_SESSION['guest_continuem'] = bin2hex(random_bytes(32));
+    echo json_encode(["success" => true, "message" => "Access allowed"]);
+}
+}
+//create a session without login 
+if(isset($_POST['continueWithoutLoginStatus']) && $_POST['continueWithoutLoginStatus'] ==true ){
+    //create a session
+    $_SESSION['user_id']= random_num(5);
+    $_SESSION['guest_token'] = bin2hex(random_bytes(32));
+    $_SESSION['is_temp_user'] = true; // mark as temporary
+    $trmpUser = $_SESSION['is_temp_user'];
+    $guestToken =$_SESSION['guest_token'];
+    $userId=$_SESSION['user_id'];
     $treeId= "node". random_num(6);
+    unset($_SESSION['guest_continuem']); 
+    $rank ="admin";
+    $stmt =$con->prepare("INSERT INTO members (`temp_user`, `memberUnid`,`guest_token`, `treeLink`, `rank`) VALUES(?,?,?,?,?)");
+    $stmt->bind_param("sssss",$trmpUser,$userId,$guestToken,$treeId,$rank);
+    if($stmt->execute()){
+        echo json_encode(["success" => true, "message" => "temperary account created"]);
+    }else{
+        echo json_encode(["success" => false, "message" => "Error creating temperary account"]);
+    }
+    
+}
+if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
+    //get node link from admin
+    $userId=$_SESSION['user_id'];
+    $rank ="admin";
+    $adminQuery = $con->prepare("SELECT treeLink FROM members WHERE memberUnid= ? AND rank =?");
+    $adminQuery->bind_param("ss",$userId,$rank);
+    $adminQuery->execute();
+    $adminResults =$adminQuery->get_result();
+    $adminData= $adminResults ->fetch_assoc();
+    $treeId= $adminData['treeLink'];
     $memberUnid=  random_num(6);
     $name = sanitize($_POST['name']);
     $idNumber = sanitize($_POST['idNumber']);
@@ -142,18 +176,18 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
         //   //relationship
       //   { data: { source: 'same', target: 'mary' }},
       if($connectionDirection == "forward"){
-        $stmt = $con->prepare("INSERT relationships (`source`, `target`)
+        $stmt = $con->prepare("INSERT relationships (`source`, `target`,`treeId`)
         VALUES
-        (?,?)");
-        $stmt->bind_param("ss",$connectionUnid,$memberUnid);
+        (?,?,?)");
+        $stmt->bind_param("sss",$connectionUnid,$memberUnid,$treeId);
         if($stmt->execute()){
             echo json_encode(["success"=>true,"message"=>"success"]);
         }
       }else if($connectionDirection == "backward"){
-        $stmt = $con->prepare("INSERT relationships (`source`, `target`)
+        $stmt = $con->prepare("INSERT relationships (`source`, `target`,`treeId`)
         VALUES
-        (?,?)");
-        $stmt->bind_param("ss",$memberUnid,$connectionUnid);
+        (?,?,?)");
+        $stmt->bind_param("sss",$memberUnid,$connectionUnid,$treeId);
         if($stmt->execute()){
             echo json_encode(["success"=>true,"message"=>"success"]);
         }

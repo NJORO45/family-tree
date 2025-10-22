@@ -17,10 +17,29 @@ function sanitize(input) {
         .replace(/[&<>"'`]/g, match => map[match])
         .replace(/\r?\n|\r/g, " "); // normalize newlines
 }
+async function getuserStatus() {
+           
+            const response = await fetch('getuserstatus.php',{
+                method:"GET",
+                headers:{"Accept":"application/json"}  
+            });
+            const text = await response.text();
+            console.log(text)
+            try{
+                const result = JSON.parse(text);
+                console.log(result)
+                return result.message;
+            }
+            catch(jsonErr){
+              console.error("JSON parse error:", jsonErr, text);
+              return [];
+            }
+}
 
 
-
-addEventListener("DOMContentLoaded",()=>{
+addEventListener("DOMContentLoaded",async()=>{
+   const data = await getuserStatus();
+    const userName = document.querySelector("#userName");
     const alertMessage = document.querySelector("#alertMessage");
     const p = document.querySelector("p");
     const closeNodedata = document.querySelector("#closeNodedata");
@@ -40,6 +59,10 @@ addEventListener("DOMContentLoaded",()=>{
     const died = document.querySelector("#died");
     const nickName = document.querySelector("#nickName");
     const csrtfTokenid = document.querySelector("#csrtfTokenid");
+    const alertnodeData = document.querySelector("#alertnodeData");
+    const closealertdata = document.querySelector("#closealertdata");
+    const profileBtn = document.querySelector("#profileBtn");
+    const continueWithouttsBtn = document.querySelector("#continueWithouttsBtn");
 
     addnewNode.addEventListener("click",()=>{
         newNodeData.classList.toggle("hidden");
@@ -47,7 +70,9 @@ addEventListener("DOMContentLoaded",()=>{
     closeNodedata.addEventListener("click",()=>{
         newNodeData.classList.add("hidden");
     });
-
+closealertdata.addEventListener("click",()=>{
+        alertnodeData.classList.add("hidden");
+    });
 
   memberPhoto.addEventListener('change', (event) => {
     const file = event.target.files[0];
@@ -59,7 +84,15 @@ addEventListener("DOMContentLoaded",()=>{
         preview.classList.add("hidden");
     }
   });
-  addNewNodeBtn.addEventListener("click",e=>{
+  addNewNodeBtn.addEventListener("click",async()=>{
+    //check if user is guest and if they dont want to save the data
+    const data = await getuserStatus();
+    console.log(data)
+    if(data[0].temp_user=='true' && (data[0].guest_continuem!="" || data[0].guest_continuem== "undefined")){
+      //popup alert to alert the user if they want the data to be saved or not
+      alertnodeData.classList.remove("hidden");
+      console.log(data[0].temp_user)
+    }else{
     if(nickName.value=="" && name.value==""){
         showAlert({
         alertMessage,
@@ -130,8 +163,48 @@ addEventListener("DOMContentLoaded",()=>{
           }
           addnewNodeFunction();
     }
+  }
   });
+continueWithouttsBtn.addEventListener("click",async ()=>{
+  //continue donnt save tree to user
+              // Now create FormData and add all fields
+  const csrtfTokenValue = csrtfTokenid.value;
+  const formData = new FormData();
+  formData.append("guest_continuemStatus", true);
+  formData.append("csrtfToken", sanitize(csrtfTokenValue));
 
+  console.log(formData)
+    const response = await fetch('insertData.php',{
+      method:"POST",
+      // headers:{"Content-Type":"multipart/form-data"},
+      body:formData
+    });
+    const text = await response.text();
+    console.log(text);
+    try{
+      const result = JSON.parse(text);
+      // console.log(result);
+      if(result.success){
+          //login success
+          showTimedAlert({
+            alertMessage,
+            message: result.message,
+            addNewNodeBtn,
+            newNodeData,
+            url:""
+          });
+      }else{
+          showAlert({
+              alertMessage,
+              message: result.message ,
+              addNewMemberBtn,
+          });
+      }
+    }
+    catch(jsonErr){
+      console.log("response error:" + jsonErr);
+    }
+});
 
 
   isDeceased.addEventListener('change', () => {

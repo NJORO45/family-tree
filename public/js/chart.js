@@ -19,6 +19,33 @@ function sanitize(input) {
         .replace(/[&<>"'`]/g, match => map[match])
         .replace(/\r?\n|\r/g, " "); // normalize newlines
 }
+async function getuserStatus() {
+           
+            const response = await fetch('getuserstatus.php',{
+                method:"GET",
+                headers:{"Accept":"application/json"}  
+            });
+            const text = await response.text();
+            console.log(text)
+            try{
+                const result = JSON.parse(text);
+                console.log(result)
+             if (Array.isArray(result)) {
+                console.log("✅ Data fetched successfully:", result);
+                return result;
+              } else if (result.success && Array.isArray(result.message)) {
+                // Support for wrapped responses too
+                return result.message;
+              } else {
+                console.error("❌ Unexpected format:", result);
+                return [];
+              }
+            }
+            catch(jsonErr){
+              console.error("JSON parse error:", jsonErr, text);
+              return [];
+            }
+}
 async function getdataFunction() {
            
             const response = await fetch('getdata.php',{
@@ -57,7 +84,6 @@ function supportsWebP() {
 }
 
 addEventListener("DOMContentLoaded",async()=>{
-
   const newmemberData = document.querySelector("#newmemberData");
     const alertMessage = document.querySelector("#alertMessage");
     const closenewmemberdata = document.querySelector("#closenewmemberdata");
@@ -168,7 +194,7 @@ let updatedData='';
         name: 'breadthfirst',
         directed: true,
         padding: 30,
-        spacingFactor: 2,
+        spacingFactor: 1.2,
         orientation: 'horizontal' // Top → Bottom
       },
        //  Control zoom behavior

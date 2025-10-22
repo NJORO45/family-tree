@@ -74,3 +74,32 @@ export function showTimedAlert({
     }
   }, 2500);
 }
+
+export async function refreshCsrfTokens() {
+    const csrfInputs = document.querySelectorAll(".csrtfToken");
+    const basePath = window.location.pathname.includes('/php/')
+  ? '../../includes/csrfTokenGenerator.php'
+  : '../includes/csrfTokenGenerator.php';
+    try {
+        const response = await fetch(basePath, {
+            method: "GET",
+            headers: { "Accept": "application/json" }
+        });
+
+        const text = await response.text();
+        console.log(text);
+
+        try {
+            const results = JSON.parse(text);
+            if (results && results.csrfToken) {
+                csrfInputs.forEach(input => {
+                    input.value = results.csrfToken;
+                });
+            }
+        } catch (jsonErr) {
+            console.error("JSON parse error:", jsonErr);
+        }
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+}

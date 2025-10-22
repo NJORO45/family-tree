@@ -1,3 +1,14 @@
+<?php
+session_start();
+$temp_user = $_SESSION['is_temp_user'];
+if (isset($_SESSION['user_id'])) {
+   
+} else {
+    header("Location:../index.html");
+    exit;
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,9 +43,6 @@
        <i class="ri-error-warning-fill text-xl"></i>
        <p>alert message</p>
    </div>
-   <div>
-    
-   </div>
    <!-- Top Navigation Bar -->
 <nav class="w-full bg-white shadow-md px-2 md:px-6 py-3 flex justify-between gap-1 items-center fixed z-20">
 
@@ -57,7 +65,12 @@
   <div class="relative" id="userMenu">
     <button id="userMenuButton" class="flex items-center space-x-2 focus:outline-none ">
         <i class="ri-user-line w-10 h-10 rounded-full border-2 border-green-400 flex items-center justify-center text-lg"></i>
-      <span class="hidden md:block text-gray-700 font-medium">John</span>
+      
+      <?php
+      if($temp_user==true){
+        echo '<span id="userName" class="hidden md:block text-gray-700 font-medium">Guest</span>';
+      }
+      ?>
     </button>
 
     <!-- Dropdown Menu -->
@@ -229,7 +242,29 @@
     </div>
         
   </div>
- <script src="../js/csrf.js"></script>
+  <!-- popup alert -->
+    <div id="alertnodeData" class="hidden fixed flex flex-col justify-center items-center  z-50 h-screen overflow-y-auto  w-full h-screen my-4 mx-4">
+  <input type="hidden" id="editcsrtfTokenid" class="csrtfToken" id="">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+        <div class="flex flex-row space-y-2 ">
+          <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Info Notification</h2>
+          <i id="closealertdata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
+        </div>
+        <div class="flex flex-col gap-2">
+         <p>
+          Kindly update your profile details so that your family tree can be saved by clicking <strong>Profile</strong>.  
+          If this is for trial purposes only, just click <strong>Continue</strong>.
+        </p>
+        </div>
+       
+        <div class="flex flex-row gap-2 m-4  text-center  mx-auto">
+          <button id="profileBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Profile</button>
+          <button id="continueWithouttsBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Continue</button>
+        </div>
+    </div>
+        
+  </div>
+ <script type="module" src="../js/csrf.js"></script>
  <script type="module" src="../js/chart.js"></script>
  <script src="../js/main.js"></script>
  <script type="module"  src="../js/addMember.js"></script>
