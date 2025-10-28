@@ -4,7 +4,7 @@
      <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./main.css">
+    <link rel="stylesheet" href="../main.css">
     <!--favicon -->
     <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon"> 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet"/>
@@ -19,7 +19,7 @@
     <div class="w-full h-screen flex overflow-hidden justify-center items-start pt-20 bg-gray-50">
         <div class="flex flex-col space-y-6 bg-white shadow-lg rounded-lg p-8 max-w-sm w-full">
             <div class="flex flex-col">
-                <label for="i_number" class="font-medium text-gray-700">ID NUMBER</label>
+                <label for="i_number" class="font-medium text-gray-700">Tel</label>
                 <input type="number" class="border-2 border-green-300 outline-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
             <div class="flex flex-row items-center">
@@ -31,20 +31,10 @@
                 <label for="email" class="font-medium text-gray-700">Email</label>
                 <input type="email" class="border-2 border-green-300 outline-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
             </div>
-            <div class="flex flex-col">
-                <label for="password" class="font-medium text-gray-700">Password</label>
-                <input type="password" class="border-2 border-green-300 outline-none rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-400">
-            </div>
              <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
             <div class="flex flex-col gap-2">
-                <button id="login" class="bg-green-500 px-4 py-2 rounded-lg shadow-lg text-white text-xl font-semibold hover:bg-green-400 transition">login</button>
-                <div class="flex flex-row flex-wrap gap-2">
-                    <p>Don't have an account </p>
-                    <button id="continue" class="underline">Continue</button>
-                </div>
-                <div class="flex flex-row flex-wrap gap-2">
-                    <a href="php/resetPassword.php" id="forgotPassword" class="underline">Forgot password</a>
-                </div>
+                <button id="login" class="bg-green-500 px-4 py-2 rounded-lg shadow-lg text-white text-xl font-semibold hover:bg-green-400 transition">Reset Password</button>
+                
             </div>
         </div>
     </div>

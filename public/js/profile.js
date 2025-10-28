@@ -1,6 +1,6 @@
 import { showTimedAlert } from './utilities/alerthandler.js';
 import { showAlert } from './utilities/alerthandler.js';
-
+import { scrolltotop } from './utilities/alerthandler.js';
 async function fetchProfile() {
     try{
         const response = await fetch('profileData.php',{
@@ -49,6 +49,7 @@ addEventListener("DOMContentLoaded",async()=>{
     const subscriptionPlan = document.querySelector("#subscriptionPlan");
     const planExpiryDate = document.querySelector("#planExpiryDate");
     const p = document.querySelector("p");
+    scrolltotop();
     let fnamestatus=false;
     let lnamestatus=false;
     let emailstatus=false;

@@ -51,6 +51,34 @@ if(isset($_POST['continueWithoutLoginStatus']) && $_POST['continueWithoutLoginSt
     }
     
 }
+if(isset($_POST['passwordResetStatus'])&& $_POST['passwordResetStatus']==true){
+    $unid =  $_SESSION['user_id'];
+    $oldpassword= sanitize($_POST['oldpassword']);
+    $confirmnewpassword = sanitize($_POST['confirmnewpassword']);
+   
+    $stmt = $con->prepare("SELECT * FROM members WHERE `memberUnid` = ? LIMIT 1");
+    $stmt->bind_param("s",$unid);
+    if($stmt->execute()){
+        $results = $stmt->get_result();
+        $user=$results->fetch_assoc();
+        if($user && password_verify($oldpassword,$user['passwordHash'])){
+            $hashedPassword = password_hash($confirmnewpassword,PASSWORD_DEFAULT);
+            $updatetData = $con->prepare("UPDATE `members` SET `passwordHash`= ?
+            WHERE `memberUnid`= ?");
+            $updatetData->bind_param("ss",$hashedPassword,$unid);
+            if($updatetData->execute()){
+                echo json_encode(["success" => true, "message" => "Password updated"]); 
+                //send email to user to tell them that the password was changed if it wosnt then to block the action
+            }else{
+                echo json_encode(["success" => false, "message" => "error accured when updating password"]); 
+            }
+        }else{
+            echo json_encode(["success" => false, "message" => "wrong old password"]);
+        }
+    }else{
+        echo json_encode(["success" => false, "message" => "Database error"]);
+    }
+}
 if(isset($_POST['profileUpdate'])&& $_POST['profileUpdate']==true){
     $unid =  $_SESSION['user_id'];
 $Fname = sanitize($_POST['first_name']);
@@ -61,13 +89,13 @@ $tel = sanitize($_POST['tel']);
 $_SESSION['guest_token'] = "";
 $_SESSION['is_temp_user'] = "false"; // mark as temporary 
 unset($_SESSION['guest_continuem']); 
-    
+    $tempPassword = password_hash("0", PASSWORD_DEFAULT); // hashed temporary password
     $insertData = $con->prepare("UPDATE `members` SET 
-    `temp_user`=?,`guest_token`=?,`first_name`= ?,`last_name`= ?,`email`= ?,`tel`= ?
+    `temp_user`=?,`guest_token`=?,`first_name`= ?,`last_name`= ?,`email`= ?,`tel`= ?,`passwordHash`=?
      WHERE `memberUnid`= ?");
      $trmpUser = $_SESSION['is_temp_user'];
     $guestToken =$_SESSION['guest_token'];
-    $insertData->bind_param("sssssss",$trmpUser,$guestToken,$Fname,$Lname,$email,$tel,$unid);
+    $insertData->bind_param("ssssssss",$trmpUser,$guestToken,$Fname,$Lname,$email,$tel,$tempPassword,$unid);
     if($insertData->execute()){
         echo json_encode(["success" => true, "message" => "Profile updated"]); 
     }else{
@@ -85,7 +113,8 @@ if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
     $adminData= $adminResults ->fetch_assoc();
     $treeId= $adminData['treeLink'];
     $memberUnid=  random_num(6);
-    $name = sanitize($_POST['name']);
+    $fname = sanitize($_POST['fname']);
+    $lname = sanitize($_POST['lname']);
     $idNumber = sanitize($_POST['idNumber']);
     $birthDate = sanitize($_POST['birthDate']);
     $died = sanitize($_POST['died']);
@@ -142,10 +171,10 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
 
     
     // //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
     VALUES
-    (?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$role,$photoPathWEBP,$photoPathJPG);
+    (?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssssss",$treeId,$memberUnid,$fname,$lname,$idNumber,$birthDate,$died,$nickName,$role,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         echo json_encode(["success"=>true,"message"=>"success"]);
     }else{
@@ -156,7 +185,8 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
     $treeId= sanitize($_POST['connectionNode']);
     $connectionUnid= sanitize($_POST['connectionUnid']);
     $memberUnid=  random_num(6);
-    $name = sanitize($_POST['newmembersname']);
+    $newmembersfname = sanitize($_POST['newmembersfname']);
+    $newmemberslname = sanitize($_POST['newmemberslname']);
     $idNumber = sanitize($_POST['newMemberidNumber']);
     $birthDate = sanitize($_POST['newMemberbirthDate']);
     $died = sanitize($_POST['newMemberdied']);
@@ -189,10 +219,10 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
 }
 
     //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
     VALUES
-    (?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssss",$treeId,$memberUnid,$name,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$photoPathWEBP,$photoPathJPG);
+    (?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssssss",$treeId,$memberUnid,$newmembersfname,$newmemberslname,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         //echo json_encode(["success"=>true,"message"=>"success"]);
         //check if connetion is forawd or backwards
@@ -225,7 +255,8 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
 if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
     $treeId     = sanitize($_POST['treeId']);
     $memberUnid = sanitize($_POST['userId']);
-    $name       = sanitize($_POST['editname']);
+    $editfname  = sanitize($_POST['editfname']);
+    $editlname  = sanitize($_POST['editlname']);
     $idNumber   = sanitize($_POST['editidNumber']);
     $birthDate  = sanitize($_POST['editbirthDate']);
     $died       = sanitize($_POST['editdied']);
@@ -255,12 +286,12 @@ if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
         }
 
         // Update including new photo
-        $stmt = $con->prepare("UPDATE members  SET name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=?, photo_webp=?, photo_jpg=? WHERE memberUnid=? AND treeId=? ");
-        $stmt->bind_param( "ssssssssss",$name, $idNumber, $birthDate, $died, $nickName, $role, $photoPathWEBP, $photoPathJPG, $memberUnid, $treeId);
+        $stmt = $con->prepare("UPDATE members  SET first_name=?, last_name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=?, photo_webp=?, photo_jpg=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "sssssssssss",$editfname,$editlname, $idNumber, $birthDate, $died, $nickName, $role, $photoPathWEBP, $photoPathJPG, $memberUnid, $treeId);
     } else {
         //  Update without touching photo fields
-        $stmt = $con->prepare("UPDATE members SET name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=? WHERE memberUnid=? AND treeId=? ");
-        $stmt->bind_param( "ssssssss", $name, $idNumber, $birthDate, $died, $nickName, $role, $memberUnid, $treeId);
+        $stmt = $con->prepare("UPDATE members SET first_name=?, last_name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "sssssssss", $editfname,$editlname, $idNumber, $birthDate, $died, $nickName, $role, $memberUnid, $treeId);
     }
 
     
@@ -271,4 +302,46 @@ if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
     }
 }
 
+if(isset($_POST['removememberStatus']) && $_POST['removememberStatus']==true){
+    $memberUnid = sanitize($_POST['removeMemberId']);
+    $message="";
+    $response = [
+        "deleted_as_target" => false,
+        "deleted_as_source" => false,
+        "message" => ""
+    ];
+    $stmt = $con->prepare("DELETE FROM members WHERE memberUnid= ?");
+        $stmt->bind_param( "s", $memberUnid);
+        if ($stmt->execute()) {
+        // Delete where member is target
+        $deleteTarget = $con->prepare("DELETE FROM relationships WHERE target = ?");
+        $deleteTarget->bind_param("s", $memberUnid);
+        if ($deleteTarget->execute()) {
+            if ($deleteTarget->affected_rows > 0) {
+                $response["deleted_as_target"] = true;
+            }
+        }
+
+        //Delete where member is source
+        $deleteSource = $con->prepare("DELETE FROM relationships WHERE source = ?");
+        $deleteSource->bind_param("s", $memberUnid);
+        if ($deleteSource->execute()) {
+            if ($deleteSource->affected_rows > 0) {
+                $response["deleted_as_source"] = true;
+            }
+        }
+        if ($response["deleted_as_target"] && $response["deleted_as_source"]) {
+            $response["message"] = "Member removed from both source and target relationships.";
+        } elseif ($response["deleted_as_target"]) {
+            $response["message"] = "Member removed as target.";
+        } elseif ($response["deleted_as_source"]) {
+            $response["message"] = "Member removed as source.";
+        } else {
+            $response["message"] = "No relationships found for this member.";
+        }
+        echo json_encode(["success" => true, "message" => "Member and related connections deleted successfully.","details"=>$response]);
+    } else {
+        echo json_encode(["success" => false, "message" => "failed to delete from database"]);
+    }
+}
 ?>

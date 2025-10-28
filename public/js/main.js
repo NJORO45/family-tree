@@ -3,5 +3,5 @@ addEventListener("DOMContentLoaded",()=>{
     const userDropdown = document.querySelector("#userDropdown");
     userMenuButton.addEventListener("click",()=>{
         userDropdown.classList.toggle("hidden");
-    })
+    });  
 });

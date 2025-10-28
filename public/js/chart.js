@@ -96,7 +96,8 @@ addEventListener("DOMContentLoaded",async()=>{
     const isDeceasednewMember = document.querySelector("#isDeceasednewMember");
     const newMemberdeathContainer = document.querySelector("#newMemberdeathContainer");
 
-    const newmembersname = document.querySelector("#newmembersname");
+    const newmembersfname = document.querySelector("#newmembersfname");
+    const newmemberslname = document.querySelector("#newmemberslname");
     const newMemberidNumber = document.querySelector("#newMemberidNumber");
     const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
     const newMemberdied = document.querySelector("#newMemberdied");
@@ -114,13 +115,15 @@ addEventListener("DOMContentLoaded",async()=>{
     const editrole = document.querySelector("#editrole");
     const isDeceasededit = document.querySelector("#isDeceasededit");
     const deathContaineredit = document.querySelector("#deathContaineredit");
-let editnamestatus=false;
-      let editidNumberstatus=false;
-      let editbirthDatestatus=false;
-      let editdiedstatus=false;
-      let editnickNamestatus=false;
-      let editrolestatus=false;
-      let editmemberPhotostatus=false;
+    //remove memeber
+    
+    let editnamestatus=false;
+    let editidNumberstatus=false;
+    let editbirthDatestatus=false;
+    let editdiedstatus=false;
+    let editnickNamestatus=false;
+    let editrolestatus=false;
+    let editmemberPhotostatus=false;
     closenewmemberdata.addEventListener("click",()=>{
         newmemberData.classList.add("hidden");
     });
@@ -215,10 +218,11 @@ cy.nodes().forEach(node => {
   card.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
       <img class="w-full h-auto rounded" src="${supportsWebP() ? d.photo_webp : d.photo_jpg}" 
-         alt="${d.name}" >
+         alt="${d.first_name}" >
     </div>
     <div class="flex flex-col space-y-1 text-xs mt-1">
-      <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>Name:</label><p>${node.data('name')}</p></div>
+      <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>First Name:</label><p>${node.data('first_name')}</p></div>
+      <div class="flex flex-row gap-1 flex-wrap break-words text-xs md:text-md"><label>Last Name:</label><p>${node.data('last_name')}</p></div>
       <div class="flex flex-row gap-1 flex-wrap "><label class="flex flex-wrap ">Nick name:</label><p>${node.data('nickname')}</p></div>
       <div class="flex flex-row gap-1 flex-wrap "><label class="flex flex-wrap ">role:</label><p>${node.data('role')}</p></div>
       <div  class="w-full flex justify-center md:justify-end"><button id="readMore" class="readMore cursor-pointer bg-white rounded px-2 py-1">Read More</button></div>
@@ -228,7 +232,7 @@ cy.nodes().forEach(node => {
   const readMoreBtn = card.querySelector(".readMore");
   readMoreBtn.addEventListener("click", (e) => {
     e.stopPropagation(); // prevent other click events
-    console.log("Read more clicked for:", d.name);
+    console.log("Read more clicked for:", d.first_name);
 
     // Example: show in a side panel
       const detailscontainer = document.getElementById('detailscontainer');
@@ -239,22 +243,23 @@ cy.nodes().forEach(node => {
     detailsBox.innerHTML = `
     <div class="w-full overflow-hidden rounded-md">
       <img class="w-full h-auto rounded" src="${supportsWebP() ? d.photo_webp : d.photo_jpg}" 
-         alt="${d.name}">
+         alt="${d.first_name}">
     </div>
     <div class="flex flex-col space-y-1 text-xs mt-1">
-      <div class="flex flex-row gap-1"><label>Name:</label><p>${d.name}</p></div>
+      <div class="flex flex-row gap-1"><label>First Name:</label><p>${d.first_name}</p></div>
+      <div class="flex flex-row gap-1"><label>Last Name:</label><p>${d.last_name}</p></div>
       <div class="flex flex-row gap-1"><label>Nickname:</label><p>${d.nickname }</p></div>
       <div class="flex flex-row gap-1"><label>Role:</label><p>${d.role }</p></div>
       <div class="flex flex-row gap-1"><label>Bari:</label><p>igi</p></div>
-      <div class="flex flex-row gap-1"><label>ID:</label><p>35855794</p></div>
+      <div class="flex flex-row gap-1"><label>ID:</label><p>${d.idNumber }</p></div>
       <div class="flex flex-row gap-1"><label>Email</label><p>@gmail.com</p></div>
       <div class="flex flex-row gap-1"><label>Tel:</label><p>0717700654</p></div>
       <div class="flex flex-row gap-1"><label>location:</label><p>uthiru</p></div>
       
     </div>
-    <div class="w-full flex justify-center">
-     <button id="editMemberBtn" 
-              class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-md">Edit</button>
+    <div class="w-full flex justify-center gap-12">
+     <button id="deleteMemberBtn" class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-md">Delete</button>
+     <button id="editMemberBtn" class="bg-green-400 hover:bg-green-500 text-white rounded px-3 py-1 text-md">Edit</button>
     </div>
     <!-- RELATIONSHIP CONTROLS -->
   <div class="mt-4 p-2 border-t border-gray-300">
@@ -311,6 +316,8 @@ directionSelect.addEventListener("change", (e) => {
       { value: "default", text: "--default--" },
       { value: "mother", text: "Mother" },
       { value: "father", text: "Father" },
+      { value: "husband", text: "Husband" },
+      { value: "wife", text: "Wife" },
       { value: "other", text: "Other" },
     ];
   } else {
@@ -326,12 +333,63 @@ directionSelect.addEventListener("change", (e) => {
     relationSelect.appendChild(optionEl);
   });
 });
+//remove member data  
+const removeMemberId = document.querySelector("#removeMemberId");
+const removenodeData = document.querySelector("#removenodeData");
+const deleteMemberBtn = document.querySelector("#deleteMemberBtn");
+const cancelBtn = document.querySelector("#cancelBtn");
+const removeMemberBtn = document.querySelector("#removeMemberBtn");
+const removecsrtfTokenid = document.querySelector("#removecsrtfTokenid");
+deleteMemberBtn.addEventListener("click",()=>{
+  removenodeData.classList.remove("hidden");
+  removeMemberId.value=d.id;
+});
+cancelBtn.addEventListener("click",()=>{
+  removenodeData.classList.add("hidden");
+  removeMemberId.value="";
+});
+removeMemberBtn.addEventListener("click",async()=>{
+  const formData = new FormData();
+  formData.append("removememberStatus", true);
+  formData.append("csrtfToken", sanitize(removecsrtfTokenid.value));
+  formData.append("removeMemberId", sanitize(removeMemberId.value));
+  const response = await fetch('insertData.php',{
+    method:"POST",
+    body:formData
+  });
+  const text = await response.text();
+  console.log(text);
+  try{
+    const result = JSON.parse(text);
+    // console.log(result);
+    if(result.success){
+        //login success
+        showTimedAlert({
+          alertMessage,
+          message: result.message,
+          removeMemberBtn,
+          newNodeData:removenodeData,
+          url:""
+        });
+    }else{
+      showAlert({
+        alertMessage,
+        message: result.message,
+        removeMemberBtn,
+      });
+    }
+  }
+  catch(jsonErr){
+    console.log("response error:" + jsonErr);
+  }
+});
 //edit user data 
 const editMemberBtn = detailsBox.querySelector("#editMemberBtn");
 const editnodeData = document.querySelector("#editnodeData");
 
 const editpreview = document.querySelector("#editpreview");
-const editname = document.querySelector("#editname");
+const editfname = document.querySelector("#editfname");
+const editlname = document.querySelector("#editlname");
 const editidNumber = document.querySelector("#editidNumber");
 const editbirthDate = document.querySelector("#editbirthDate");
 const editdied = document.querySelector("#editdied");
@@ -355,14 +413,16 @@ editMemberBtn.addEventListener("click", () => {
       editpreview.classList.add("hidden"); 
       console.log("empry url",photoUrl);
     }
-    editname.value=d.name;
-    editidNumber.value=d.idNumber;
+    editfname.value=d.first_name;
+    editlname.value=d.last_name; 
+    editidNumber.value=d.idNumber; 
     editbirthDate.value=d.birthDate;
     editdied.value=d.died;
     editnickName.value=d.nickname;
     editrole.value=d.role;
  originalData = {
-                editname: d.name,
+                editfname: d.first_name,
+                editlname: d.last_name,
                 editidNumber: d.idNumber,
                 editbirthDate: d.birthDate,
                 editdied: d.died,
@@ -395,8 +455,8 @@ editMemberBtn.addEventListener("click", () => {
         }
       });
       
-      editname.addEventListener('change', () => {
-        if(editname.value.trim()===""){
+      editfname.addEventListener('change', () => {
+        if(editfname.value.trim()===""){
             editnamestatus=false;
         }else{
             editnamestatus=true;
@@ -441,7 +501,8 @@ editMemberBtn.addEventListener("click", () => {
   saveChangesBtn.addEventListener("click",()=>{
     console.log("savechanges clicked",editdied.value);
     updatedData= {
-                editname: sanitize(editname.value),
+                editfname: sanitize(editfname.value),
+                editlname: sanitize(editlname.value),
                 editidNumber: sanitize(editidNumber.value),
                 editbirthDate: sanitize(editbirthDate.value) === "" 
                 ? "0000-00-00 00:00:00" : sanitize(editdied.value),
@@ -462,7 +523,8 @@ editMemberBtn.addEventListener("click", () => {
             formData.append("treeId", d.treeId);
             formData.append("userId", d.id);
             formData.append("csrtfToken", editcsrtfTokenid.value);
-            formData.append("editname", sanitize(editname.value));
+            formData.append("editfname", sanitize(editfname.value));
+            formData.append("editlname", sanitize(editlname.value));
             formData.append("editidNumber", sanitize(editidNumber.value));
             formData.append(
               "editbirthDate",
@@ -626,8 +688,7 @@ cy.on('zoom pan render', ()=>{
 updateCardPositions(); // initial render
 //member add form 
   addNewMemberBtn.addEventListener("click",e=>{
-      console.log(connectionUnid.value,connectionContinumRelationship.value,connectionDirection.value)
-    if(newMembernickName.value=="" && newmembersname.value==""){
+    if(newMembernickName.value=="" && newmembersfname.value==""){
         showAlert({
         alertMessage,
         message: "Please enter at least a nickname or name." ,
@@ -637,14 +698,16 @@ updateCardPositions(); // initial render
         async function addnewmemberFunction() {
                 const csrtfTokenValue = csrtfTokenid.value;
                // console.log(csrtfTokenValue)
-                const newmembersname = document.querySelector("#newmembersname");
+                const newmembersfname = document.querySelector("#newmembersfname");
+                const newmemberslname = document.querySelector("#newmemberslname");
                 const newMemberidNumber = document.querySelector("#newMemberidNumber");
                 const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
                 const newMemberdied = document.querySelector("#newMemberdied");
                 const newMembernickName = document.querySelector("#newMembernickName");
                 const postData ={
                     addnewMemberStatus:true,
-                    newmembersname:sanitize(newmembersname.value),
+                    newmembersfname:sanitize(newmembersfname.value),
+                    newmemberslname:sanitize(newmemberslname.value),
                     newMemberidNumber:sanitize(newMemberidNumber.value),
                     newMemberdied:sanitize(newMemberdied.value),
                     newMemberbirthDate:sanitize(newMemberbirthDate.value),

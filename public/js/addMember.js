@@ -38,7 +38,7 @@ async function getuserStatus() {
 
 
 addEventListener("DOMContentLoaded",async()=>{
-   const data = await getuserStatus();
+   //const data = await getuserStatus();
     const userName = document.querySelector("#userName");
     const alertMessage = document.querySelector("#alertMessage");
     const p = document.querySelector("p");
@@ -93,16 +93,17 @@ closealertdata.addEventListener("click",()=>{
       alertnodeData.classList.remove("hidden");
       console.log(data[0].temp_user)
     }else{
-    if(nickName.value=="" && name.value==""){
+    if(nickName.value=="" && fname.value==""){
         showAlert({
         alertMessage,
-        message: "Please enter at least a nickname or name." ,
+        message: "Please enter at least a nickname or first name." ,
         addNewMemberBtn,
       });
     }else{
         async function addnewNodeFunction() {
                 const csrtfTokenValue = csrtfTokenid.value;
-                const name = document.querySelector("#name");
+                const fname = document.querySelector("#fname");
+                const lname = document.querySelector("#lname");
                 const idNumber = document.querySelector("#idNumber");
                 const birthDate = document.querySelector("#birthDate");
                 const died = document.querySelector("#died");
@@ -110,7 +111,8 @@ closealertdata.addEventListener("click",()=>{
                 const role = document.querySelector("#role");
                 const postData ={
                     addNodeStatus:true,
-                    name:sanitize(name.value),
+                    fname:sanitize(fname.value),
+                    lname:sanitize(lname.value),
                     idNumber:sanitize(idNumber.value),
                     died:sanitize(died.value),
                     birthDate:sanitize(birthDate.value),

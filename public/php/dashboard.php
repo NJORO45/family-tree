@@ -76,7 +76,7 @@ if (isset($_SESSION['user_id'])) {
     <!-- Dropdown Menu -->
     <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100">
       <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Profile</a>
-      <a href="#" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Settings</a>
+      <a href="settings.php" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Settings</a>
       <div class="border-t border-gray-200 my-1"></div>
       <a id="logoutBtn" href="#" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Logout</a>
     </div>
@@ -105,8 +105,12 @@ if (isset($_SESSION['user_id'])) {
           <img id="preview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
         </div>
         <div class="flex flex-col gap-2">
-          <label for="img">Name</label>
-          <input id="name" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+          <label for="img">First Name</label>
+          <input id="fname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Last Name</label>
+          <input id="lname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
@@ -160,8 +164,12 @@ if (isset($_SESSION['user_id'])) {
           <img id="newMemberpreview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
         </div>
         <div class="flex flex-col gap-2">
-          <label for="img">Name</label>
-          <input id="newmembersname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+          <label for="img">First Name</label>
+          <input id="newmembersfname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Last Name</label>
+          <input id="newmemberslname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
@@ -206,8 +214,12 @@ if (isset($_SESSION['user_id'])) {
           <img id="editpreview" class="w-32 h-32 object-cover rounded hidden" alt="Preview">
         </div>
         <div class="flex flex-col gap-2">
-          <label for="img">Name</label>
-          <input id="editname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+          <label for="img">First Name</label>
+          <input id="editfname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Last Name</label>
+          <input id="editlname" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
@@ -264,9 +276,32 @@ if (isset($_SESSION['user_id'])) {
     </div>
         
   </div>
+  <!-- delete container -->
+  <div id="removenodeData" class="hidden fixed flex flex-col justify-center items-center  z-50 h-screen overflow-y-auto  w-full h-screen my-4 mx-4">
+    <input type="hidden" id="removecsrtfTokenid" class="csrtfToken" >
+    <input type="hidden" id="removeMemberId" ">
+    <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+      <div class="flex flex-row space-y-2 ">
+        <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Remove a member</h2>
+        
+      </div>
+      <div class="flex flex-col gap-2">
+        <p>
+        Kindly not this will delete all member info to continue click <strong>continue</strong>.  
+        If you do not wish to continue, just click <strong>cancel</strong>.
+      </p>
+      </div>
+      
+      <div class="flex flex-row gap-2 m-4  text-center  mx-auto">
+        <button id="cancelBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Cancel</button>
+        <button id="removeMemberBtn" class="bg-green-400 px-2 py-1 rounded-lg w-max text-white mx-auto">Continue</button>
+      </div>
+    </div>
+        
+  </div>
  <script type="module" src="../js/csrf.js"></script>
  <script type="module" src="../js/chart.js"></script>
- <script src="../js/main.js"></script>
+ <script type="module" src="../js/main.js"></script>
  <script type="module"  src="../js/addMember.js"></script>
  <script type="module"  src="../js/logout.js"></script>
 </body>

@@ -129,7 +129,6 @@ export async function logoutFunction() {
                       alertMessage,
                       message: results.message,
                       logoutBtn,
-                      newNodeData,
                       url:""
                     });
               }else{
@@ -147,3 +146,20 @@ export async function logoutFunction() {
       }
     });
 }
+//scroll to top
+export async function scrolltotop() {
+  const backToTopBtn= document.querySelector("#backToTopBtn");
+ window.addEventListener("scroll",()=>{
+        if(window.scrollY > 200){
+            backToTopBtn.classList.remove("hidden");
+        }else{
+             backToTopBtn.classList.add("hidden");
+        }
+    });
+    backToTopBtn.addEventListener("click",()=>{
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+    });
+  }
