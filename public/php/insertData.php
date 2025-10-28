@@ -51,6 +51,29 @@ if(isset($_POST['continueWithoutLoginStatus']) && $_POST['continueWithoutLoginSt
     }
     
 }
+if(isset($_POST['profileUpdate'])&& $_POST['profileUpdate']==true){
+    $unid =  $_SESSION['user_id'];
+$Fname = sanitize($_POST['first_name']);
+$Lname = sanitize($_POST['last_name']);
+$email = sanitize($_POST['email']);
+$tel = sanitize($_POST['tel']);
+//estro sertain setions 
+$_SESSION['guest_token'] = "";
+$_SESSION['is_temp_user'] = "false"; // mark as temporary 
+unset($_SESSION['guest_continuem']); 
+    
+    $insertData = $con->prepare("UPDATE `members` SET 
+    `temp_user`=?,`guest_token`=?,`first_name`= ?,`last_name`= ?,`email`= ?,`tel`= ?
+     WHERE `memberUnid`= ?");
+     $trmpUser = $_SESSION['is_temp_user'];
+    $guestToken =$_SESSION['guest_token'];
+    $insertData->bind_param("sssssss",$trmpUser,$guestToken,$Fname,$Lname,$email,$tel,$unid);
+    if($insertData->execute()){
+        echo json_encode(["success" => true, "message" => "Profile updated"]); 
+    }else{
+        echo json_encode(["success" => false, "message" => "error accured when updating profile"]); 
+    }
+}
 if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
     //get node link from admin
     $userId=$_SESSION['user_id'];
