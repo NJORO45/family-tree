@@ -196,7 +196,7 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
     $uploadDir = "../../uploads/";
     $photoPathJPG = "";
     $photoPathWEBP = "";
-
+    $rank ="user";
     if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
     $ext = strtolower(pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION));
     $newFileName = uniqid("img_") . '.' . $ext;
@@ -219,13 +219,13 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
 }
 
     //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`rank`,`photo_webp`, `photo_jpg`) 
     VALUES
-    (?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssssssss",$treeId,$memberUnid,$newmembersfname,$newmemberslname,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$photoPathWEBP,$photoPathJPG);
+    (?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssssss",$treeId,$memberUnid,$newmembersfname,$newmemberslname,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$rank,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         //echo json_encode(["success"=>true,"message"=>"success"]);
-        //check if connetion is forawd or backwards
+        //check if connetion is forawd or backwardss
         //   //relationship
       //   { data: { source: 'same', target: 'mary' }},
       if($connectionDirection == "forward"){
@@ -342,6 +342,70 @@ if(isset($_POST['removememberStatus']) && $_POST['removememberStatus']==true){
         echo json_encode(["success" => true, "message" => "Member and related connections deleted successfully.","details"=>$response]);
     } else {
         echo json_encode(["success" => false, "message" => "failed to delete from database"]);
+    }
+}
+//login loginStatus
+if(isset($_POST['loginStatus']) && $_POST['loginStatus'] == "true"){
+$loginemail       = sanitize($_POST['loginemail']);
+$logintel       = sanitize($_POST['logintel']);
+$loginpassword       = sanitize($_POST['loginpassword']);
+
+if (empty($loginemail) && empty($logintel)) {
+        echo json_encode(["success" => false, "message" => "Email or phone required."]);
+        exit;
+    }
+
+    // Determine login method
+    if (!empty($loginemail)) {
+        $stmt = $con->prepare("SELECT * FROM members WHERE email = ? LIMIT 1");
+        $stmt->bind_param("s", $loginemail);
+    } else {
+        $stmt = $con->prepare("SELECT * FROM members WHERE tel = ? LIMIT 1");
+        $stmt->bind_param("s", $logintel);
+    }
+
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $user = $result->fetch_assoc();
+
+        if (password_verify($loginpassword, $user['passwordHash'])) {
+            $_SESSION['user_id'] = $user['memberUnid'];
+            $_SESSION['is_temp_user'] = false;
+
+            // Check if this user is an admin
+            if ($user['rank'] === 'admin') {
+                $_SESSION['user_id'] = $user['memberUnid'];
+                $_SESSION['is_admin'] = true;
+                $_SESSION['is_temp_user'] = false;
+                $_SESSION['treeLink'] = $user['treeLink']; // assume each admin owns a tree
+                echo json_encode(["success" => true, "message" => "Admin login successful", "role" => "admin"]);
+                exit;
+            }
+
+            // Check if this user also exists as a members in any tree
+            $memberCheck = $con->prepare("SELECT * FROM members WHERE email = ? OR tel = ? LIMIT 1");
+            $memberCheck->bind_param("ss", $email, $tel);
+            $memberCheck->execute();
+            $memberResult = $memberCheck->get_result();
+
+            if ($memberResult->num_rows === 1) {
+                $member = $memberResult->fetch_assoc();
+                $_SESSION['user_id'] = $member['memberUnid'];
+                $_SESSION['is_admin'] = false;
+                $_SESSION['is_temp_user'] = false;
+                $_SESSION['treeLink'] = $member['treeId'];
+                echo json_encode(["success" => true, "message" => "Member login successful", "role" => "member"]);
+            } else {
+                echo json_encode(["success" => false, "message" => "User found but not linked to a tree"]);
+            }
+
+        } else {
+            echo json_encode(["success" => false, "message" => "Incorrect password"]);
+        }
+    } else {
+        echo json_encode(["success" => false, "message" => "User not found"]);
     }
 }
 ?>
