@@ -76,6 +76,8 @@ while($row=$results->fetch_assoc()){
             "birthDate" => $row["birthDate"],
             "died" => $row["died"],
             "role" => $row["role"],
+            "email" => $row["email"],
+            "tel" => $row["tel"],
             "photo_webp" => $row["photo_webp"],
             "photo_jpg" => $row["photo_jpg"],
         ]

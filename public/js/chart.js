@@ -252,8 +252,8 @@ cy.nodes().forEach(node => {
       <div class="flex flex-row gap-1"><label>Role:</label><p>${d.role }</p></div>
       <div class="flex flex-row gap-1"><label>Bari:</label><p>igi</p></div>
       <div class="flex flex-row gap-1"><label>ID:</label><p>${d.idNumber }</p></div>
-      <div class="flex flex-row gap-1"><label>Email</label><p>@gmail.com</p></div>
-      <div class="flex flex-row gap-1"><label>Tel:</label><p>0717700654</p></div>
+      <div class="flex flex-row gap-1"><label>Email</label><p>${d.email }</p></div>
+      <div class="flex flex-row gap-1"><label>Tel:</label><p>${d.tel }</p></div>
       <div class="flex flex-row gap-1"><label>location:</label><p>uthiru</p></div>
       
     </div>
@@ -349,6 +349,16 @@ cancelBtn.addEventListener("click",()=>{
   removeMemberId.value="";
 });
 removeMemberBtn.addEventListener("click",async()=>{
+    const rankState = document.querySelector("#rankState");
+    console.log(rankState.value)
+    if(rankState.value=="false"){
+      showAlert({
+        alertMessage,
+        message: "Only admin can add family tree" ,
+        addNewNodeBtn,
+      });
+      return;
+    }
   const formData = new FormData();
   formData.append("removememberStatus", true);
   formData.append("csrtfToken", sanitize(removecsrtfTokenid.value));
@@ -396,6 +406,16 @@ const editdied = document.querySelector("#editdied");
 const editnickName = document.querySelector("#editnickName");
 const editrole = document.querySelector("#editrole");
 editMemberBtn.addEventListener("click", () => {
+    const rankState = document.querySelector("#rankState");
+    console.log(rankState.value)
+    if(rankState.value=="false"){
+      showAlert({
+        alertMessage,
+        message: "Only admin can add family tree" ,
+        addNewNodeBtn,
+      });
+      return;
+    }
     editnodeData.classList.remove("hidden");
     //pass data
    
@@ -688,6 +708,16 @@ cy.on('zoom pan render', ()=>{
 updateCardPositions(); // initial render
 //member add form 
   addNewMemberBtn.addEventListener("click",e=>{
+    const rankState = document.querySelector("#rankState");
+            console.log(rankState.value)
+            if(rankState.value=="false"){
+              showAlert({
+                alertMessage,
+                message: "Only admin can add family tree" ,
+                addNewNodeBtn,
+              });
+              return;
+            }
     if(newMembernickName.value=="" && newmembersfname.value==""){
         showAlert({
         alertMessage,

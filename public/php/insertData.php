@@ -377,10 +377,10 @@ if (empty($loginemail) && empty($logintel)) {
             // Check if this user is an admin
             if ($user['rank'] === 'admin') {
                 $_SESSION['user_id'] = $user['memberUnid'];
-                $_SESSION['is_admin'] = true;
-                $_SESSION['is_temp_user'] = false;
+                $_SESSION['is_admin'] = "true";
+                $_SESSION['is_temp_user'] = "false";
                 $_SESSION['treeLink'] = $user['treeLink']; // assume each admin owns a tree
-                echo json_encode(["success" => true, "message" => "Admin login successful", "role" => "admin"]);
+                echo json_encode(["success" => true, "message" => "Admin login successful", "role" => $_SESSION['is_admin']]);
                 exit;
             }
 
@@ -393,8 +393,8 @@ if (empty($loginemail) && empty($logintel)) {
             if ($memberResult->num_rows === 1) {
                 $member = $memberResult->fetch_assoc();
                 $_SESSION['user_id'] = $member['memberUnid'];
-                $_SESSION['is_admin'] = false;
-                $_SESSION['is_temp_user'] = false;
+                $_SESSION['is_admin'] = "false";
+                $_SESSION['is_temp_user'] = "false";
                 $_SESSION['treeLink'] = $member['treeId'];
                 echo json_encode(["success" => true, "message" => "Member login successful", "role" => "member"]);
             } else {

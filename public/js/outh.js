@@ -41,15 +41,56 @@ addEventListener("DOMContentLoaded",()=>{
     const loginEmail = document.querySelector("#loginEmail");
     const loginPassword = document.querySelector("#loginPassword");
     const loginTel = document.querySelector("#loginTel");
+    let emailstate= false;
+    let telstate= false;
     //login
+    loginTel.addEventListener("blur",()=>{
+            if(!validateAndFormatKenyanPhone(loginTel.value)){
+               console.log("not") 
+               telstate=false;
+            }else{
+                console.log("is")
+                telstate=true;
+            }
+            return;
+        });
+        loginEmail.addEventListener("blur",()=>{
+            if(!isValidEmail(loginEmail.value)){
+               console.log("not") 
+               emailstate=false;
+            }else{
+                console.log("is")
+                emailstate=true;
+            }
+            return;
+        });
     login.addEventListener("click",async()=>{
         const csrtfTokenValue = csrtfTokenid.value;
+        // Validate only the filled field
+        if (loginEmail.value !== "" && !emailstate) {
+        showAlert({
+            alertMessage,
+            message: "Invalid email format.",
+            login,
+        });
+        return;
+        }
+
+        if (loginTel.value !== "" && !telstate) {
+        showAlert({
+            alertMessage,
+            message: "Invalid phone number format.",
+            login,
+        });
+        return;
+        }
         if(loginEmail.value!="" &&loginTel.value!=""){
             showAlert({
                 alertMessage,
                 message: "Choose email or tel not both",
                 login,
             });
+            return;
         }
         if(loginEmail.value==="" &&loginTel.value===""){
             showAlert({
@@ -57,6 +98,7 @@ addEventListener("DOMContentLoaded",()=>{
                 message: "Please enter either your email or phone number.",
                 login,
             });
+            return;
         }
         if(loginPassword.value===""){
             showAlert({
@@ -64,6 +106,7 @@ addEventListener("DOMContentLoaded",()=>{
                 message: "Password is required.",
                 login,
             });
+            return;
         }
         const postData = new FormData();
         postData.append("loginStatus", true);
@@ -86,16 +129,18 @@ addEventListener("DOMContentLoaded",()=>{
             if (result.success) {
             showTimedAlert({
                 alertMessage,
-                message: "Login successful!",
+                message: result.message,
                 addNewNodeBtn: login,
                 url:"php/dashboard.php"
             });
+            return;
             } else {
             showAlert({
                 alertMessage,
                 message: result.message || "Invalid login credentials.",
                 addNewNodeBtn: login,
             });
+            return;
             }
             } catch(jsonErr){
                 console.error("error executing function:", jsonErr);

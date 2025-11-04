@@ -61,8 +61,8 @@ addEventListener("DOMContentLoaded",async()=>{
     const csrtfTokenid = document.querySelector("#csrtfTokenid");
     const alertnodeData = document.querySelector("#alertnodeData");
     const closealertdata = document.querySelector("#closealertdata");
-    const profileBtn = document.querySelector("#profileBtn");
     const continueWithouttsBtn = document.querySelector("#continueWithouttsBtn");
+    //const rankState = document.querySelector("#rankState");
 
     addnewNode.addEventListener("click",()=>{
         newNodeData.classList.toggle("hidden");
@@ -86,6 +86,16 @@ closealertdata.addEventListener("click",()=>{
   });
   addNewNodeBtn.addEventListener("click",async()=>{
     //check if user is guest and if they dont want to save the data
+     const rankState = document.querySelector("#rankState");
+    console.log(rankState.value)
+    if(rankState.value=="false"){
+      showAlert({
+        alertMessage,
+        message: "Only admin can add family tree" ,
+        addNewNodeBtn,
+      });
+      return;
+    }
     const data = await getuserStatus();
     console.log(data)
     if(data[0].temp_user=='true' && (data[0].guest_continuem!="" || data[0].guest_continuem== "undefined")){
@@ -97,7 +107,7 @@ closealertdata.addEventListener("click",()=>{
         showAlert({
         alertMessage,
         message: "Please enter at least a nickname or first name." ,
-        addNewMemberBtn,
+        addNewNodeBtn,
       });
     }else{
         async function addnewNodeFunction() {

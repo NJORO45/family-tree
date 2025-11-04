@@ -1,13 +1,14 @@
 <?php
 session_start();
-$temp_user = $_SESSION['is_temp_user'];
+
 if (isset($_SESSION['user_id'])) {
    
 } else {
     header("Location:../index.html");
     exit;
 }
-
+$temp_user = $_SESSION['is_temp_user'];
+$rankStatus = $_SESSION['is_admin'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,7 +73,7 @@ if (isset($_SESSION['user_id'])) {
       }
       ?>
     </button>
-
+    <input id="rankState" type="hidden" value="<?php echo $rankStatus?>">
     <!-- Dropdown Menu -->
     <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100">
       <a href="profile.php" class="block px-4 py-2 hover:bg-gray-100 text-gray-700">Profile</a>
