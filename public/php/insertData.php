@@ -372,7 +372,7 @@ if (empty($loginemail) && empty($logintel)) {
 
         if (password_verify($loginpassword, $user['passwordHash'])) {
             $_SESSION['user_id'] = $user['memberUnid'];
-            $_SESSION['is_temp_user'] = false;
+            $_SESSION['is_temp_user'] = "false";
 
             // Check if this user is an admin
             if ($user['rank'] === 'admin') {
@@ -385,12 +385,12 @@ if (empty($loginemail) && empty($logintel)) {
             }
 
             // Check if this user also exists as a members in any tree
-            $memberCheck = $con->prepare("SELECT * FROM members WHERE email = ? OR tel = ? LIMIT 1");
-            $memberCheck->bind_param("ss", $email, $tel);
+            $memberCheck = $con->prepare("SELECT * FROM members WHERE email = ? or tel=? LIMIT 1");
+            $memberCheck->bind_param("ss", $loginemail, $logintel);
             $memberCheck->execute();
             $memberResult = $memberCheck->get_result();
 
-            if ($memberResult->num_rows === 1) {
+            if ($memberResult->num_rows >0) {
                 $member = $memberResult->fetch_assoc();
                 $_SESSION['user_id'] = $member['memberUnid'];
                 $_SESSION['is_admin'] = "false";
@@ -398,7 +398,7 @@ if (empty($loginemail) && empty($logintel)) {
                 $_SESSION['treeLink'] = $member['treeId'];
                 echo json_encode(["success" => true, "message" => "Member login successful", "role" => "member"]);
             } else {
-                echo json_encode(["success" => false, "message" => "User found but not linked to a tree"]);
+                echo json_encode(["success" => false, "message" => "User found but not linked to a tree ","email"=>$loginemail ]);
             }
 
         } else {
@@ -407,5 +407,109 @@ if (empty($loginemail) && empty($logintel)) {
     } else {
         echo json_encode(["success" => false, "message" => "User not found"]);
     }
+}
+//send otp to email
+if(isset($_POST['passwordResetotpStatus']) && $_POST['passwordResetotpStatus'] == "true"){
+    $email       = sanitize($_POST['email']);
+    $tel       = sanitize($_POST['tel']);
+    //
+    if (empty($email) && empty($tel)) {
+        echo json_encode(["success" => false, "message" => "Email or phone required."]);
+        exit;
+    }
+
+    // Determine login method
+    if (!empty($email)) {
+        $stmt = $con->prepare("SELECT * FROM members WHERE email = ? LIMIT 1");
+        $stmt->bind_param("s", $email);
+    } else {
+        $stmt = $con->prepare("SELECT * FROM members WHERE tel = ? LIMIT 1");
+        $stmt->bind_param("s", $tel);
+    }
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 1) {
+        $member = $result->fetch_assoc();
+
+        //create otp
+        $otp= random_num(4);
+        $otpvalidationToken = bin2hex(random_bytes(32));
+        $expiry = new DateTime();
+        $expiry->modify('+2 hours');
+        $expiryDate = $expiry->format('Y-m-d H:i:s');
+        //update to database
+        $user = $member['memberUnid'];
+        $updateQuery = $con->prepare("UPDATE members SET OTP =?, otpvalidationToken =?, otpExpiryDate =?  WHERE memberUnid = ?");
+        $updateQuery->bind_param("ssss",$otp,$otpvalidationToken,$expiryDate,$user);
+        if($updateQuery->execute()){
+            //send email
+            sendEmail($email,$otpvalidationToken,$otp);
+            echo json_encode(["success" => true, "message" => "OTP sent succesfully","otpvalidationToken"=>$otpvalidationToken]);
+        }
+    } else {
+    echo json_encode(["success" => false, "message" => "User not found"]);
+    }
+}
+if(isset($_POST['validateotpStatus']) && $_POST['validateotpStatus'] == "true"){
+    $otpInput = sanitize($_POST['otpInput']);
+    $userId = $_SESSION['user_id'];
+    $stmt = $con->prepare("SELECT * FROM members WHERE memberUnid = ?  LIMIT 1");
+    $stmt->bind_param("s", $userId);
+    $stmt->execute();
+    $stmtResult = $stmt->get_result();
+
+    if ($stmtResult->num_rows === 1) {
+        $data = $stmtResult->fetch_assoc();
+        $otp = $data['OTP'];
+        $otpExpiryDate = $data['otpExpiryDate'];
+        $currentTime = date("Y-m-d H:i:s");
+
+        // Check if OTP matches
+        if ($otpInput === $otp) {
+            // Check if OTP is expired
+            if ($currentTime <= $otpExpiryDate) {
+                echo json_encode([
+                    "success" => true,
+                    "message" => "OTP is valid. You can now reset your password."
+                ]);
+            } else {
+                echo json_encode([
+                    "success" => false,
+                    "message" => "OTP has expired. Please request a new one."
+                ]);
+            }
+        } else {
+            echo json_encode([
+                "success" => false,
+                "message" => "Invalid OTP entered."
+            ]);
+        }
+    } else {
+        echo json_encode([
+            "success" => false,
+            "message" => "User not found or invalid session."
+        ]);
+    }
+}
+if(isset($_POST['updatePasswordStatus']) && $_POST['updatePasswordStatus'] == "true"){
+    $newPassword = sanitize($_POST['newPassword']);
+    $userId = $_SESSION['user_id'];
+    $passwordHash = password_hash($newPassword,PASSWORD_DEFAULT);
+    $otp = ""; // empty string
+    $otpvalidationToken = ""; // empty string
+    $expiryDate = null; // null for date/time columns
+    //update
+    $updateQuery = $con->prepare("UPDATE members SET OTP =?, otpvalidationToken =?, otpExpiryDate =?, passwordHash =?  WHERE memberUnid = ?");
+        $updateQuery->bind_param("sssss",$otp,$otpvalidationToken,$expiryDate,$passwordHash,$userId);
+        if($updateQuery->execute()){
+            echo json_encode(["success" => true, "message" => "Password Updated succesfully"]);
+            // Unset all session variables
+            // $_SESSION = [];
+            // // Destroy the session
+            // session_destroy();
+        }else{
+            echo json_encode(["success" => true, "message" => "Error Occured While Updating Password"]);
+        }
 }
 ?>

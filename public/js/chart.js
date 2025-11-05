@@ -31,13 +31,13 @@ async function getuserStatus() {
                 const result = JSON.parse(text);
                 console.log(result)
              if (Array.isArray(result)) {
-                console.log("✅ Data fetched successfully:", result);
+                console.log(" Data fetched successfully:", result);
                 return result;
               } else if (result.success && Array.isArray(result.message)) {
                 // Support for wrapped responses too
                 return result.message;
               } else {
-                console.error("❌ Unexpected format:", result);
+                console.error("Unexpected format:", result);
                 return [];
               }
             }
@@ -58,13 +58,13 @@ async function getdataFunction() {
                 const result = JSON.parse(text);
                 console.log(result)
              if (Array.isArray(result)) {
-                console.log("✅ Data fetched successfully:", result);
+                console.log("Data fetched successfully:", result);
                 return result;
               } else if (result.success && Array.isArray(result.message)) {
                 // Support for wrapped responses too
                 return result.message;
               } else {
-                console.error("❌ Unexpected format:", result);
+                console.error(" Unexpected format:", result);
                 return [];
               }
             }

@@ -28,7 +28,7 @@ $guest_token = isset($_SESSION['guest_token']) ? $_SESSION['guest_token'] : null
 
 $memberTree = null;
 
-$rank = "admin";
+//$rank = "admin";
 
 // Stop early if user_id is missing
 if (!$user_id) {
@@ -36,14 +36,14 @@ if (!$user_id) {
     exit;
 }
 
-if ($is_temp_user) {
+if ($is_temp_user=="true") {
     // Guest users
-    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ? AND rank = ? AND guest_token = ? LIMIT 1");
-    $query->bind_param("sss", $user_id, $rank, $guest_token);
+    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ?  AND guest_token = ? LIMIT 1");
+    $query->bind_param("ss", $user_id, $guest_token);
 } else {
     // Permanent users
-    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ? AND rank = ? LIMIT 1");
-    $query->bind_param("ss", $user_id, $rank);
+    $query = $con->prepare("SELECT treeLink FROM members WHERE memberUnid = ?  LIMIT 1");
+    $query->bind_param("s", $user_id);
 }
 
 $query->execute();
@@ -54,8 +54,8 @@ if ($result && $result->num_rows > 0) {
     $memberTree = $row['treeLink'];
     //echo json_encode(["success" => true, "treeId" => $memberTree]);
 } else {
+    echo json_encode(["success" => false, "message" => "No tree linked yet."]);
     exit();
-   // echo json_encode(["success" => false, "message" => "No tree linked yet."]);
 }
 
 
