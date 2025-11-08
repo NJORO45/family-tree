@@ -19,6 +19,23 @@ function sanitize(input) {
         .replace(/[&<>"'`]/g, match => map[match])
         .replace(/\r?\n|\r/g, " "); // normalize newlines
 }
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+}
+function validateAndFormatKenyanPhone(phone) {
+    // Remove spaces, hyphens, parentheses
+    const cleaned = phone.replace(/[\s-()]/g, "");
+
+    // Check if it starts with 07 and has exactly 10 digits
+    const regex = /^07\d{8}$/;
+
+    if (regex.test(cleaned)) {
+        // Convert to +254 format
+        return "+254" + cleaned.substring(1);
+    } else {
+        return null; // invalid number
+    }
+}
 async function getuserStatus() {
            
             const response = await fetch('getuserstatus.php',{
@@ -99,6 +116,8 @@ addEventListener("DOMContentLoaded",async()=>{
     const newmembersfname = document.querySelector("#newmembersfname");
     const newmemberslname = document.querySelector("#newmemberslname");
     const newMemberidNumber = document.querySelector("#newMemberidNumber");
+    const tel = document.querySelector("#newMembertel");
+    const email = document.querySelector("#newMemberemail");
     const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
     const newMemberdied = document.querySelector("#newMemberdied");
     const newMembernickName = document.querySelector("#newMembernickName");
@@ -109,6 +128,8 @@ addEventListener("DOMContentLoaded",async()=>{
     const editpreview = document.querySelector("#editpreview");
     const editname = document.querySelector("#editname");
     const editidNumber = document.querySelector("#editidNumber");
+    const edittel = document.querySelector("#edittel");
+    const editemail = document.querySelector("#editemail");
     const editbirthDate = document.querySelector("#editbirthDate");
     const editdied = document.querySelector("#editdied");
     const editnickName = document.querySelector("#editnickName");
@@ -116,7 +137,10 @@ addEventListener("DOMContentLoaded",async()=>{
     const isDeceasededit = document.querySelector("#isDeceasededit");
     const deathContaineredit = document.querySelector("#deathContaineredit");
     //remove memeber
-    
+    let emailstate = false; 
+let telstate =false;
+let editemailstate = false; 
+let edittelstate =false;
     let editnamestatus=false;
     let editidNumberstatus=false;
     let editbirthDatestatus=false;
@@ -405,6 +429,8 @@ const editbirthDate = document.querySelector("#editbirthDate");
 const editdied = document.querySelector("#editdied");
 const editnickName = document.querySelector("#editnickName");
 const editrole = document.querySelector("#editrole");
+const edittel = document.querySelector("#edittel");
+const editemail = document.querySelector("#editemail")
 editMemberBtn.addEventListener("click", () => {
     const rankState = document.querySelector("#rankState");
     console.log(rankState.value)
@@ -436,6 +462,8 @@ editMemberBtn.addEventListener("click", () => {
     editfname.value=d.first_name;
     editlname.value=d.last_name; 
     editidNumber.value=d.idNumber; 
+    edittel.value=d.tel; 
+    editemail.value=d.email; 
     editbirthDate.value=d.birthDate;
     editdied.value=d.died;
     editnickName.value=d.nickname;
@@ -444,6 +472,8 @@ editMemberBtn.addEventListener("click", () => {
                 editfname: d.first_name,
                 editlname: d.last_name,
                 editidNumber: d.idNumber,
+                editemail: d.email,
+                edittel: d.tel,
                 editbirthDate: d.birthDate,
                 editdied: d.died,
                 editnickName: d.nickname,
@@ -517,13 +547,42 @@ editMemberBtn.addEventListener("click", () => {
             editrolestatus=true;
         }
       });
-
+     edittel.addEventListener("change",()=>{
+            if(!validateAndFormatKenyanPhone(edittel.value)){
+               edittelstate=false;
+               showAlert({
+                  alertMessage,
+                  message: "Invalid tel fomart" ,
+                  addNewNodeBtn,
+                });
+            }else{
+                edittelstate=true;
+            }
+            return;
+        });
+        editemail.addEventListener("change",()=>{
+            if(!isValidEmail(editemail.value)){
+               console.log("not") 
+               editemailstate=false;
+               showAlert({
+                  alertMessage,
+                  message: "Invalid email fomart" ,
+                  addNewNodeBtn,
+                });
+            }else{
+                console.log("is")
+                editemailstate=true;
+            }
+            return;
+        });
   saveChangesBtn.addEventListener("click",()=>{
     console.log("savechanges clicked",editdied.value);
     updatedData= {
                 editfname: sanitize(editfname.value),
                 editlname: sanitize(editlname.value),
                 editidNumber: sanitize(editidNumber.value),
+                editemail: sanitize(editemail.value),
+                edittel: sanitize(edittel.value),
                 editbirthDate: sanitize(editbirthDate.value) === "" 
                 ? "0000-00-00 00:00:00" : sanitize(editdied.value),
                 editdied: sanitize(editdied.value) === "" 
@@ -534,7 +593,7 @@ editMemberBtn.addEventListener("click", () => {
             const hasChanges = Object.keys(originalData).some(
                 key => originalData[key] !== updatedData[key]
             );
-            if(hasChanges &&(editnamestatus || editidNumberstatus || editbirthDatestatus || editdiedstatus || editnickNamestatus || editrolestatus || editmemberPhotostatus)){
+            if(hasChanges &&(editnamestatus || editidNumberstatus || editbirthDatestatus || editdiedstatus || editnickNamestatus || editrolestatus || editmemberPhotostatus ||editemailstate||edittelstate)){
               console.log("has changed");
                       async function editmemberFunction() {
                const formData = new FormData();
@@ -546,6 +605,8 @@ editMemberBtn.addEventListener("click", () => {
             formData.append("editfname", sanitize(editfname.value));
             formData.append("editlname", sanitize(editlname.value));
             formData.append("editidNumber", sanitize(editidNumber.value));
+            formData.append("editemail", sanitize(editemail.value));
+            formData.append("edittel", sanitize(edittel.value));
             formData.append(
               "editbirthDate",
               sanitize(editbirthDate.value) === "" ? "0000-00-00 00:00:00" : sanitize(editbirthDate.value)
@@ -707,6 +768,62 @@ cy.on('zoom pan render', ()=>{
 });
 updateCardPositions(); // initial render
 //member add form 
+tel.addEventListener("blur",()=>{
+      if(!validateAndFormatKenyanPhone(tel.value)){
+          telstate=false;
+          showAlert({
+            alertMessage,
+            message: "Invalid tel fomart" ,
+            addNewNodeBtn,
+          });
+      }else{
+          telstate=true;
+      }
+      return;
+  });
+  email.addEventListener("blur",()=>{
+      if(!isValidEmail(email.value)){
+          console.log("not") 
+          emailstate=false;
+          showAlert({
+            alertMessage,
+            message: "Invalid email fomart" ,
+            addNewNodeBtn,
+          });
+      }else{
+          console.log("is")
+          emailstate=true;
+      }
+      return;
+  });
+     tel.addEventListener("blur",()=>{
+            if(!validateAndFormatKenyanPhone(tel.value)){
+               telstate=false;
+               showAlert({
+                  alertMessage,
+                  message: "Invalid tel fomart" ,
+                  addNewNodeBtn,
+                });
+            }else{
+                telstate=true;
+            }
+            return;
+        });
+        email.addEventListener("blur",()=>{
+            if(!isValidEmail(email.value)){
+               console.log("not") 
+               emailstate=false;
+               showAlert({
+                  alertMessage,
+                  message: "Invalid email fomart" ,
+                  addNewNodeBtn,
+                });
+            }else{
+                console.log("is")
+                emailstate=true;
+            }
+            return;
+        });
   addNewMemberBtn.addEventListener("click",e=>{
     const rankState = document.querySelector("#rankState");
             console.log(rankState.value)
@@ -718,19 +835,39 @@ updateCardPositions(); // initial render
               });
               return;
             }
+      if(email.value==""){
+          emailstate=true;
+          
+      }
+       if(tel.value==""){
+          telstate=true;
+          
+      }
     if(newMembernickName.value=="" && newmembersfname.value==""){
         showAlert({
         alertMessage,
         message: "Please enter at least a nickname or name." ,
         addNewMemberBtn,
       });
-    }else{
+      return;
+    }  
+    if(emailstate===false || telstate===false ){
+       showAlert({
+        alertMessage,
+        message: "Please enter correct fomart email/tel" ,
+        addNewNodeBtn,
+      });
+      return;
+    }
+    console.log("states",emailstate," ",telstate)
         async function addnewmemberFunction() {
                 const csrtfTokenValue = csrtfTokenid.value;
                // console.log(csrtfTokenValue)
                 const newmembersfname = document.querySelector("#newmembersfname");
                 const newmemberslname = document.querySelector("#newmemberslname");
                 const newMemberidNumber = document.querySelector("#newMemberidNumber");
+                const tel = document.querySelector("#newMembertel");
+                const email = document.querySelector("#newMemberemail");
                 const newMemberbirthDate = document.querySelector("#newMemberbirthDate");
                 const newMemberdied = document.querySelector("#newMemberdied");
                 const newMembernickName = document.querySelector("#newMembernickName");
@@ -739,6 +876,8 @@ updateCardPositions(); // initial render
                     newmembersfname:sanitize(newmembersfname.value),
                     newmemberslname:sanitize(newmemberslname.value),
                     newMemberidNumber:sanitize(newMemberidNumber.value),
+                    tel:sanitize(tel.value),
+                    email:sanitize(email.value),
                     newMemberdied:sanitize(newMemberdied.value),
                     newMemberbirthDate:sanitize(newMemberbirthDate.value),
                     newMembernickName:sanitize(newMembernickName.value),
@@ -789,7 +928,7 @@ updateCardPositions(); // initial render
              }
           }
           addnewmemberFunction();
-    }
+    
   });
 
 

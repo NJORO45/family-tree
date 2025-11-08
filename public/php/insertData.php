@@ -114,8 +114,10 @@ if(isset($_POST['addNodeStatus']) && $_POST['addNodeStatus']==true){
     $treeId= $adminData['treeLink'];
     $memberUnid=  random_num(6);
     $fname = sanitize($_POST['fname']);
-    $lname = sanitize($_POST['lname']);
+    $lname = sanitize($_POST['lname']); 
     $idNumber = sanitize($_POST['idNumber']);
+    $tel = sanitize($_POST['tel']);
+    $email = sanitize($_POST['email']);
     $birthDate = sanitize($_POST['birthDate']);
     $died = sanitize($_POST['died']);
     $nickName = sanitize($_POST['nickName']);
@@ -171,10 +173,10 @@ if (isset($_FILES['photo']) && $_FILES['photo']['error'] === 0) {
 
     
     // //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`,`email`,`tel`, `birthDate`, `died`, `nickName`,`role`,`photo_webp`, `photo_jpg`)
     VALUES
-    (?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("sssssssssss",$treeId,$memberUnid,$fname,$lname,$idNumber,$birthDate,$died,$nickName,$role,$photoPathWEBP,$photoPathJPG);
+    (?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("sssssssssssss",$treeId,$memberUnid,$fname,$lname,$idNumber,$tel,$email,$birthDate,$died,$nickName,$role,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         echo json_encode(["success"=>true,"message"=>"success"]);
     }else{
@@ -188,6 +190,8 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
     $newmembersfname = sanitize($_POST['newmembersfname']);
     $newmemberslname = sanitize($_POST['newmemberslname']);
     $idNumber = sanitize($_POST['newMemberidNumber']);
+    $tel = sanitize($_POST['tel']);
+    $email = sanitize($_POST['email']);
     $birthDate = sanitize($_POST['newMemberbirthDate']);
     $died = sanitize($_POST['newMemberdied']);
     $nickName = sanitize($_POST['newMembernickName']);
@@ -219,10 +223,10 @@ if(isset($_POST['addnewMemberStatus']) && $_POST['addnewMemberStatus']==true){
 }
 
     //prepare insert data
-    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`, `birthDate`, `died`, `nickName`,`role`,`rank`,`photo_webp`, `photo_jpg`) 
+    $stmt = $con->prepare("INSERT members (`treeId`, `memberUnid`, `first_name`,`last_name`, `idNumber`,`email`,`tel`, `birthDate`, `died`, `nickName`,`role`,`rank`,`photo_webp`, `photo_jpg`) 
     VALUES
-    (?,?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->bind_param("ssssssssssss",$treeId,$memberUnid,$newmembersfname,$newmemberslname,$idNumber,$birthDate,$died,$nickName,$connectionContinumRelationship,$rank,$photoPathWEBP,$photoPathJPG);
+    (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $stmt->bind_param("ssssssssssssss",$treeId,$memberUnid,$newmembersfname,$newmemberslname,$idNumber,$email,$tel,$birthDate,$died,$nickName,$connectionContinumRelationship,$rank,$photoPathWEBP,$photoPathJPG);
     if($stmt->execute()){
         //echo json_encode(["success"=>true,"message"=>"success"]);
         //check if connetion is forawd or backwardss
@@ -258,6 +262,8 @@ if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
     $editfname  = sanitize($_POST['editfname']);
     $editlname  = sanitize($_POST['editlname']);
     $idNumber   = sanitize($_POST['editidNumber']);
+    $editemail   = sanitize($_POST['editemail']);
+    $edittel   = sanitize($_POST['edittel']);
     $birthDate  = sanitize($_POST['editbirthDate']);
     $died       = sanitize($_POST['editdied']);
     $nickName   = sanitize($_POST['editnickName']);
@@ -286,12 +292,12 @@ if (isset($_POST['editmemberStatus']) && $_POST['editmemberStatus'] == "true") {
         }
 
         // Update including new photo
-        $stmt = $con->prepare("UPDATE members  SET first_name=?, last_name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=?, photo_webp=?, photo_jpg=? WHERE memberUnid=? AND treeId=? ");
-        $stmt->bind_param( "sssssssssss",$editfname,$editlname, $idNumber, $birthDate, $died, $nickName, $role, $photoPathWEBP, $photoPathJPG, $memberUnid, $treeId);
+        $stmt = $con->prepare("UPDATE members  SET first_name=?, last_name=?, idNumber=?,email=?,tel=?, birthDate=?, died=?, nickName=?, role=?, photo_webp=?, photo_jpg=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "sssssssssssss",$editfname,$editlname, $idNumber,$editemail,$edittel, $birthDate, $died, $nickName, $role, $photoPathWEBP, $photoPathJPG, $memberUnid, $treeId);
     } else {
         //  Update without touching photo fields
-        $stmt = $con->prepare("UPDATE members SET first_name=?, last_name=?, idNumber=?, birthDate=?, died=?, nickName=?, role=? WHERE memberUnid=? AND treeId=? ");
-        $stmt->bind_param( "sssssssss", $editfname,$editlname, $idNumber, $birthDate, $died, $nickName, $role, $memberUnid, $treeId);
+        $stmt = $con->prepare("UPDATE members SET first_name=?, last_name=?, idNumber=?,email=?,tel=?, birthDate=?, died=?, nickName=?, role=? WHERE memberUnid=? AND treeId=? ");
+        $stmt->bind_param( "sssssssssss", $editfname,$editlname, $idNumber,$editemail,$edittel, $birthDate, $died, $nickName, $role, $memberUnid, $treeId);
     }
 
     

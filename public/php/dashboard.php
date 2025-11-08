@@ -95,7 +95,7 @@ $rankStatus = $_SESSION['is_admin'];
 </div>
 <div id="newNodeData" class="hidden fixed flex flex-col justify-center items-center  z-50  w-full h-screen p-4">
   <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
-      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+      <div class="flex flex-col  max-w-md w-full overflow-y-auto bg-slate-100  rounded-lg shadow-lg p-4">
         <div class="flex flex-row space-y-2 ">
           <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Family tree</h2>
           <i id="closeNodedata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
@@ -116,6 +116,14 @@ $rankStatus = $_SESSION['is_admin'];
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
           <input id="idNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="tel">Tel</label>
+          <input id="tel" type="text" placeholder=0717109696" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Email</label>
+          <input id="email" type="text" placeholder="@gmail.com" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">Born (Sunrise)</label>
@@ -148,7 +156,7 @@ $rankStatus = $_SESSION['is_admin'];
   </div>
 <div id="newmemberData" class="hidden fixed flex flex-col justify-center items-center  z-50  w-full h-screen p-4">
   <input type="hidden" id="csrtfTokenid" class="csrtfToken" id="">
-      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100 overflow-y-auto  rounded-lg shadow-lg p-4">
         <div class="flex flex-row space-y-2 ">
           <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Add member</h2>
           <i id="closenewmemberdata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
@@ -175,6 +183,14 @@ $rankStatus = $_SESSION['is_admin'];
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
           <input id="newMemberidNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="tel">Tel</label>
+          <input id="newMembertel" type="text" placeholder=0717109696" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Email</label>
+          <input id="newMemberemail" type="text" placeholder="@gmail.com" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">Born (Sunrise)</label>
@@ -204,7 +220,7 @@ $rankStatus = $_SESSION['is_admin'];
   <!-- edit  -->
   <div id="editnodeData" class="hidden fixed flex flex-col justify-center items-center  z-50 h-screen overflow-y-auto  w-full h-screen my-4">
   <input type="hidden" id="editcsrtfTokenid" class="csrtfToken" id="">
-      <div class="flex flex-col  max-w-md w-full  bg-slate-100  rounded-lg shadow-lg p-4">
+      <div class="flex flex-col  max-w-md w-full  bg-slate-100 overflow-y-auto rounded-lg shadow-lg p-4">
         <div class="flex flex-row space-y-2 ">
           <h2 class=" font-bold flex justify-end w-2/3 pr-4 text-xl">Edit Member Details</h2>
           <i id="closeeditdata" class="ri-close-large-fill flex justify-end w-1/3 text-green-400 font-bold text-2xl hover:scale-105"></i>
@@ -225,6 +241,14 @@ $rankStatus = $_SESSION['is_admin'];
         <div class="flex flex-col gap-2">
           <label for="img">ID</label>
           <input id="editidNumber" type="text" placeholder="Full name" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="tel">Tel</label>
+          <input id="edittel" type="text" placeholder=0717109696" class="px-2 py-1 rounded-lg outline-none border">
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="img">Email</label>
+          <input id="editemail" type="text" placeholder="@gmail.com" class="px-2 py-1 rounded-lg outline-none border">
         </div>
         <div class="flex flex-col gap-2">
           <label for="img">Born (Sunrise)</label>
