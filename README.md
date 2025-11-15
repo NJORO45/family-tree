@@ -12,21 +12,23 @@ NB:// this project can only fit one family tree if more than one it will overlap
 #Screenshots
 ###  Login Page
 ![Login Page](screenshots/loginPage.PNG)
-##addMemberfirstSelecton
+###  Family Tree Page
+![family tree](screenshots/familyTree.PNG)
+### addMemberfirstSelecton
 ![addMemberfirstSelecton](screenshots/addMemberfirstSelecton.PNG)
-##addMemberfinallForm
+### addMemberfinallForm
 ![addMemberfinallForm](screenshots/addMemberfinallForm.PNG)
-##removeMember
+### removeMember
 ![removeMember](screenshots/removeMember.PNG)
-##editMemberInfo
+### editMemberInfo
 ![editMemberInfo](screenshots/editMemberInfo.PNG)
-##accessToProfileAndSettings
+### accessToProfileAndSettings
 ![accessToProfileAndSettings](screenshots/accessToProfileAndSettings.PNG)
-##userProfile
+### userProfile
 ![userProfile](screenshots/userProfile.PNG)
-#userSettings
+### userSettings
 ![userSettings](screenshots/userSettings.PNG)
-##future updates
+### future updates
 -search family member by name, email,tel or nickmae
 -add OTP assword reset via Phone number
 -Delete/deactivate admin account
